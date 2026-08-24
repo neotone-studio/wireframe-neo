@@ -267,8 +267,8 @@
     <div class="nav-inner">
       <div class="masthead" role="presentation"><img src="media/wordmark/neotone.svg" alt="Neotone"></div>
       <div class="sections">
-        <a href="index.html" data-section="tonefield">Tonefield</a>
-        <a href="instrument.html" data-section="instruments">Instruments</a>
+        <a href="index.html" data-section="instruments">Instruments</a>
+        <a href="tonefield.html" data-section="tonefield">Tonefield</a>
       </div>
     </div>
   </nav>
@@ -313,7 +313,7 @@
     <nav class="next" aria-label="Read next">
       <span class="next-label">Read next</span>
       <ul class="next-list">
-        <li><a href="index.html#hijaz-tetrachord"><span class="next-kicker">Theory and culture</span><span class="next-title">The hijaz tetrachord</span></a></li>
+        <li><a href="tonefield.html#hijaz-tetrachord"><span class="next-kicker">Theory and culture</span><span class="next-title">The hijaz tetrachord</span></a></li>
       </ul>
     </nav>
 
@@ -324,8 +324,8 @@
 
       <div class="footer-top">
         <div class="footer-sections">
-          <a href="index.html">Tonefield</a>
-          <a href="instrument.html">Instruments</a>
+          <a href="index.html">Instruments</a>
+          <a href="tonefield.html">Tonefield</a>
         </div>
         <form class="footer-search" onsubmit="handleSearch(event)">
           <input type="search" placeholder="Search" />
@@ -505,7 +505,7 @@
       link.addEventListener('click', e => {
         e.preventDefault();
         const href = link.getAttribute('href');
-        const here = location.pathname.split('/').pop() || 'index.html';
+        const here = location.pathname.split('/').pop() || 'tonefield.html';
         /* Already here: just go back to the top and let the bar reopen. */
         if (href === here) { scrollToTopThen(null); return; }
         scrollToTopThen(() => { window.location.href = href; });

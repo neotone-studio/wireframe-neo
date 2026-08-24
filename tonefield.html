@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Legal · Neotone</title>
+  <title>Tonefield · Neotone</title>
   <style>
     :root { --ink: #111; --line: #d9d9d9; --muted: #4f4f4f; --green: #2a7a2a; --max: 1180px; }
 
@@ -200,83 +200,101 @@
     }
     .opening {
       max-width: 720px; margin-left: auto; margin-right: auto;
-      padding: 104px 0 88px; text-align: center;
+      padding: 64px 0 52px; text-align: center;
       font-size: 21px; font-weight: 400; line-height: 1.7; color: var(--ink);
     }
     .opening-name { font-size: 34px; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    .opening-sub { display: block; margin-top: 14px; font-size: 15px; line-height: 1.4; color: var(--muted); letter-spacing: 0.02em; }
     @media (prefers-reduced-motion: reduce) {
       .opening-wrap { animation: none; }
     }
 
-    /* ---- Article ----
-       Articles and utility pages render identically. The only difference is the
-       mark in the masthead: an article carries its container's mark, a utility
-       page carries the plain Neotone mark. Media runs to the content grid;
-       reading stays at a measure. */
-    .piece { max-width: var(--max); margin: 0 auto; padding: 0 48px 40px; }
-    .piece-head { max-width: 680px; margin: 0 auto; padding: 64px 0 44px; }
-    .piece-kicker {
-      display: block; margin-bottom: 16px;
-      font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.14em; color: var(--muted);
-    }
-    .piece-title { margin: 0 0 20px; font-size: 40px; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em; }
-    .piece-standfirst { margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); }
-    .piece-media { margin: 0 0 56px; }
-    .video-box { width: 100%; aspect-ratio: 16 / 9; background: #ededed; }
-    .piece-caption { margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
-    .piece-body { max-width: 680px; margin: 0 auto; }
-    .piece-body p { margin: 0 0 1.45em; font-size: 17px; line-height: 1.75; }
-    .piece-body p:last-child { margin-bottom: 0; }
-    .piece-sub {
-      margin: 2.4em 0 1em; font-size: 11px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
-    }
-    @media (max-width: 980px) {
-      .piece-title { font-size: 30px; }
-      .piece-head { padding-top: 48px; }
-    }
-
-    /* ---- Contents and section lists (utility pages) ---- */
-    .toc { max-width: 680px; margin: 0 auto; }
-    .toc-group { margin-bottom: 46px; }
-    .toc-group:last-child { margin-bottom: 0; }
-    .toc-label {
+    /* ---- Container feed ----
+       Previews, not cards. You read a little in place and may watch something
+       before deciding to open the piece. Because a preview can carry media, the
+       block itself is not a link: clicking a video has to play it. The title is
+       the target, with a quiet continue link at the end. This amends principle
+       14, which assumes a block with nothing interactive inside it. */
+    /* No opening line here: the masthead names Neotone and the pieces say what it is,
+   so the feed itself opens the page and carries the entry fade. */
+    .feed { max-width: var(--max); margin: 0 auto; padding: 0 48px 0;
+            animation: opening-in 760ms ease 140ms both; }
+    @media (prefers-reduced-motion: reduce) { .feed { animation: none; } }
+    .feed-item { max-width: 680px; margin: 0 auto; scroll-margin-top: 140px; }
+    .feed-item + .feed-item { margin-top: 96px; }
+    /* Every piece is built the same way: image, kicker, title, excerpt, link,
+       at the same size, with the same gap. The lead and second carry classes
+       for the editorial rule that the first two show one register each, and
+       nothing else distinguishes them. Earlier versions gave the lead a wider
+       image and put the second's image below its text to force both titles
+       into a 900px viewport; together they made the feed read as three
+       different layouts. Uniform wins. On a 900px screen the second piece's
+       kicker sits at the edge; its title is inside the first screen on
+       anything taller. */
+    .feed-media { width: 100%; aspect-ratio: 16 / 9; background: #ededed; margin-bottom: 24px; }
+    .feed-kicker {
       display: block; margin-bottom: 12px;
       font-size: 11px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.14em; color: var(--muted);
     }
-    .toc-note { margin: 0 0 14px; font-size: 13px; line-height: 1.6; color: var(--muted); }
-    .toc-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-    .toc-list li { border-bottom: 1px solid var(--line); }
-    .toc-list a { display: block; padding: 13px 0; font-size: 16px; }
-    .toc-list a:hover { color: var(--muted); }
-    .toc-out {
-      margin-left: 10px; font-size: 10px; text-transform: uppercase;
-      letter-spacing: 0.12em; color: var(--muted);
+    .feed-title { margin: 0 0 16px; font-size: 28px; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; }
+    .feed-title a:hover { color: var(--muted); }
+    .feed-excerpt { margin: 0 0 18px; font-size: 16px; line-height: 1.7; }
+    .feed-more { font-size: 14px; font-style: italic; color: var(--muted); }
+    .feed-more:hover { color: var(--ink); text-decoration: underline; }
+    @media (max-width: 980px) { .feed { padding: 0 24px 0; } .feed-title { font-size: 24px; } }
+
+    /* ---- End of feed ----
+       Load more, then subscribe. Load more continues the reading; subscribing
+       is what you do once you have decided to stop, so putting the field first
+       would interrupt a reader who is still going. When the feed eventually
+       runs out the button goes and subscribe becomes the terminus, with nothing
+       rearranged.
+
+       The bar is the only solid black in the white part of the page, so it
+       reads as the end of the run and rhymes with the footer arriving under it.
+       Sits well below the last piece and close to the footer, so scrolling to
+       it feels like reaching the end rather than finding another section. */
+    .feed-end { max-width: var(--max); margin: 96px auto 0; padding: 0 48px; }
+    @media (max-width: 980px) { .feed-end { margin-top: 80px; padding: 0 24px; } }
+    .feed-end-inner { max-width: 680px; margin: 0 auto; }
+
+    .load-more {
+      display: block; width: 100%; background: #000; color: #fff;
+      border: none; padding: 18px 0; cursor: pointer;
+      font-family: inherit; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
     }
+    .load-more:hover { background: #222; }
 
-    /* ---- Legal ----
-       Same vocabulary as the manual: a contents jump, hairline rows, and the
-       small uppercase label from .piece-sub. No new devices, because a utility
-       page that invented its own would read as a different site. */
-    .legal-jump { max-width: 680px; margin: 0 auto 64px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-    .legal-jump a { font-size: 13px; color: var(--muted); }
-    .legal-jump a:hover { color: var(--ink); }
-    .legal-jump span { font-size: 13px; color: var(--line); }
-
-    .legal-sec { max-width: 680px; margin: 0 auto 72px; scroll-margin-top: 140px; }
-    .legal-sec:last-of-type { margin-bottom: 0; }
-    .legal-sec h2 { margin: 0 0 18px; font-size: 26px; font-weight: 400; letter-spacing: -0.01em; }
-    .legal-sec > p { margin: 0 0 1.45em; font-size: 17px; line-height: 1.75; }
-    .legal-note { margin: 0 0 6px; font-size: 13px; line-height: 1.6; color: var(--muted); }
-
-    /* Rows, matching .toc-list exactly. A review point is a line you can act on,
-       which is the same shape as a contents entry. */
-    .legal-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-    .legal-list li { border-bottom: 1px solid var(--line); padding: 13px 0; font-size: 16px; line-height: 1.6; }
-    .legal-list li b { font-weight: 400; }
-    .legal-list li span { color: var(--muted); }
+    /* ---- Subscribe ----
+       Not Tonefield: that is a publication, and this is a notice board. Not
+       "stay in touch" either, which promises a relationship from a company that
+       will write four times a year. Updates says plainly what it is, the same
+       move as "Budapest · visits by appointment". */
+    .subscribe { margin-top: 56px; }
+    .subscribe-label {
+      display: block; margin-bottom: 12px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted);
+    }
+    .subscribe p { margin: 0 0 22px; font-size: 17px; line-height: 1.75; }
+    .subscribe-archive { color: var(--muted); border-bottom: 1px solid var(--line); }
+    .subscribe-archive:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .subscribe-form { display: flex; align-items: center; max-width: 420px; }
+    .subscribe-form input {
+      flex: 1; min-width: 0; background: none; color: var(--ink);
+      border: none; border-bottom: 1px solid var(--line);
+      padding: 8px 0; font-size: 15px; font-family: inherit;
+    }
+    .subscribe-form input::placeholder { color: var(--muted); }
+    .subscribe-form input:focus { outline: none; border-bottom-color: var(--ink); }
+    .subscribe-form button {
+      background: none; border: none; border-bottom: 1px solid var(--line);
+      color: var(--muted); padding: 8px 0 8px 16px;
+      font-size: 15px; font-family: inherit; cursor: pointer;
+    }
+    .subscribe-form button:hover { color: var(--ink); }
   </style>
 </head>
 <body>
@@ -291,90 +309,112 @@
     </div>
   </nav>
 
-  <article class="piece">
+  <!-- Tonefield. One feed, two registers, the kicker tells you which. The
+       running order is editorial: the first screen shows a craft piece and a
+       culture piece together, so a reader of either kind sees their own.
+       Every entry below is a piece genuinely in progress, sourced from the
+       1000th-instrument draft, the artist interviews, and the manual's third
+       register. Titles are working titles. -->
+  <!-- Opening. Same shape as the instrument page's: the name large, the
+       sentence plain. Tonefield is a coined word and this is where it gets its
+       meaning. Craft and culture are the two registers, named once here and
+       then carried by the kickers. -->
+  <div class="opening-wrap">
+    <h1 class="opening"><span class="opening-name">Tonefield</span><span class="opening-sub">Neotone&rsquo;s quarterly of craft and culture</span></h1>
+  </div>
 
-    <header class="piece-head">
-      <span class="piece-kicker">Soundventure Kft, Budapest</span>
-      <h1 class="piece-title">Legal</h1>
-      <p class="piece-standfirst">One page rather than two links. Privacy first because it applies to everyone reading, then the terms that apply once you order, then the terms that apply to the site itself.</p>
-    </header>
+  <div class="feed">
 
-    <nav class="legal-jump">
-      <a href="#privacy">Privacy</a>
-      <span>&middot;</span>
-      <a href="#sale">Terms of sale</a>
-      <span>&middot;</span>
-      <a href="#site">Terms of website use</a>
-    </nav>
+      <article class="feed-item lead" id="only-beginning">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Culture</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">Only beginning to understand what they had built</a></h2>
+        <p class="feed-excerpt">It started with a handpan that seemed too expensive and two programmers who decided to build one instead. Seven years, a thousand instruments and 418 million strikes later, the thing they made is still teaching them about the instrument it began as an answer to.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
 
-    <section class="legal-sec" id="privacy">
-      <h2>Privacy</h2>
-      <p>What is collected, why, for how long, and how to get it back or have it deleted. It applies to every reader, including one who never orders anything, which is why it comes first.</p>
-      <p class="legal-note">Reviewed against the current policy at digitalhandpan.com/privacy-policy.pdf. That document is a Japanese manufacturer's template with the names changed: it cites the Personal Information Protection Law and the Personal Information Protection Committee, which are Japan's statute and regulator, and refers to group companies, a distributor, repaired products being dispatched, and servers outside "our plant." A GDPR section is appended, so obligations are stated twice under two regimes, one of which does not apply.</p>
+      <article class="feed-item second" id="strike-not-trigger">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Craft</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">A strike is not a trigger</a></h2>
+        <p class="feed-excerpt">Two programmers watched a video of a player hitting almost the same spot on a handpan for minutes and getting a different tone every time. Everything digital instruments were good at was the opposite of that. The answer began with a kitchen scale taken apart.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
 
-      <span class="piece-sub">Cut</span>
-      <ul class="legal-list">
-        <li><b>The entire Japanese half.</b> <span>Sections resting on the Personal Information Protection Law are not the law you operate under. GDPR and the Hungarian implementation are.</span></li>
-        <li><b>Group companies, distributors, subsidiaries, the plant.</b> <span>There is one company and one workshop.</span></li>
-        <li><b>Behavioural advertising via Google.</b> <span>The policy discloses targeted advertising cookies. If that is not running, it declares processing that does not happen. If it is, a footer opt-out link is not consent.</span></li>
-        <li><b>"2022 DigitalOcean, LLC"</b> <span>as the named host. That is a copyright string pasted in as a party.</span></li>
-        <li><b>Survey, contest and event language.</b> <span>None of it exists.</span></li>
-      </ul>
+      <article class="feed-item" id="golsa-nazari">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Culture</span>
+        <h2 class="feed-title"><a href="neotone-golsa-nazari.html">&ldquo;I don&rsquo;t lose inspiration while searching for another instrument&rdquo;</a></h2>
+        <p class="feed-excerpt">Golsa Nazari is a handpan player, composer and teacher from Iran, working between acoustic instruments and a digital one. What changed for her was less the sound than the interruption: moving between scales used to mean moving between instruments, and an idea rarely survived the trip.</p>
+        <a class="feed-more" href="neotone-golsa-nazari.html">Continue reading &rarr;</a>
+      </article>
 
-      <span class="piece-sub">Missing</span>
-      <ul class="legal-list">
-        <li><b>The real categories of data.</b> <span>The policy declares name and email. You take orders: postal address, telephone, payment handled by a processor, and a serial number tied to a person for the life of the instrument.</span></li>
-        <li><b>neOS accounts and the Scale Gallery.</b> <span>An account, a public display name, and user-created scales published to other players. None of it is mentioned, and it is the most personal thing the company holds.</span></li>
-        <li><b>Named processors.</b> <span>Payment provider, email sender, host, and anything the software talks to. A list, kept current.</span></li>
-        <li><b>Retention periods that are actual periods.</b> <span>"As long as necessary" is not one. An instrument warranty gives a real number to anchor to.</span></li>
-        <li><b>Controller identity in full.</b> <span>Registered company name, seat, company registration number, and a contact route that is not only an email address.</span></li>
-        <li><b>Cookies, honestly.</b> <span>Easiest version: run none beyond what the site needs to function, say so in a sentence, and never build a consent banner. A site whose principle is answering questions where they arise should not open with a modal asking permission to track.</span></li>
-      </ul>
-    </section>
+      <article class="feed-item" id="how-much-freedom">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Craft</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">Not how many scales, but how much freedom</a></h2>
+        <p class="feed-excerpt">An acoustic handpan is one scale, chosen once, by its maker. A digital one hands that choice to the player, and a choice you make constantly needs knowledge to make it with.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
 
-    <section class="legal-sec" id="sale">
-      <h2>Terms of sale</h2>
-      <p>The document that does not currently exist, and the one with real consequences. Someone is paying five figures for an object that will not exist for another sixty days.</p>
-      <p class="legal-note">The One page already states purchase terms inline, where the question arises. This section is what those statements have to be consistent with. If the two ever disagree, the customer relies on the one they read at the moment of ordering, which is the inline one.</p>
+      <article class="feed-item" id="note-names">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Craft</span>
+        <h2 class="feed-title"><a href="neos-note-names.html">Why the note names change as you build</a></h2>
+        <p class="feed-excerpt">Build a D Kurd and something quiet happens. You place the note your ear calls an A sharp, and the instrument writes down a B flat. The logic behind that is older than the instrument, and it is the same logic a scale uses to decide what it is.</p>
+        <a class="feed-more" href="neos-note-names.html">Continue reading &rarr;</a>
+      </article>
 
-      <span class="piece-sub">Cover</span>
-      <ul class="legal-list">
-        <li><b>Right of withdrawal.</b> <span>Fourteen days on a distance sale, when the clock starts, and how to exercise it. Whether a made-to-order instrument in a chosen wood is exempt as a personalised good is exactly the question to get answered rather than assumed.</span></li>
-        <li><b>The two year guarantee of conformity</b> <span>, separate from and additional to any warranty offered voluntarily. Say which is which, because buyers conflate them.</span></li>
-        <li><b>Lead time as a commitment.</b> <span>"~60 days" appears in the specs. What happens at day 90, and what the buyer can do about it.</span></li>
-        <li><b>Deposit, balance and cancellation.</b> <span>When money is taken, what is refundable once wood has been cut, and what is not.</span></li>
-        <li><b>B-stock.</b> <span>What the grade means, what is excluded, and whether the guarantee differs.</span></li>
-        <li><b>Delivery, risk and customs.</b> <span>When risk passes, who clears the instrument, and who pays duty outside the EU.</span></li>
-        <li><b>Repairs.</b> <span>An instrument that comes back to Budapest and returns: shipping, timescale, what is covered.</span></li>
-        <li><b>Referral discounts.</b> <span>Who is eligible, whether codes stack, and how long one is good for. The wireframe already enforces rules that no document states.</span></li>
-        <li><b>The software is part of the product.</b> <span>A buyer purchases an instrument whose behaviour changes with updates. Say what is guaranteed to keep working, and for how long.</span></li>
-      </ul>
-    </section>
+      <article class="feed-item" id="every-source-clean">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Studio</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">&ldquo;Every source needs to remain clean&rdquo;</a></h2>
+        <p class="feed-excerpt">Didgeridoo, beatbox, jaw harp and a digital handpan, into a mixer, into a looper, every channel opened and closed from a MIDI controller. Zalem&rsquo;s live-looping set walked end to end, down to the didgeridoo bass sequenced offbeat against the kick and pitched from the Neotone through a vocoder.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
 
-    <section class="legal-sec" id="site">
-      <h2>Terms of website use</h2>
-      <p>The shortest of the three, and the one currently doing the least. Reading this site creates almost no relationship: there is no account, nothing to post, and nothing to agree to.</p>
-      <p class="legal-note">Reviewed against digitalhandpan.com/terms-of-use.pdf. US-style boilerplate: all-caps disclaimers, attorneys' fees, and "the laws of the EU" in the governing law clause. The EU is not a jurisdiction that can be chosen. It also governs message boards and user registration, neither of which exists, and spells the company "Sounventure" once.</p>
+      <article class="feed-item" id="orchestral-ideas">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Culture</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">&ldquo;Orchestral ideas, still thinking like a handpan player&rdquo;</a></h2>
+        <p class="feed-excerpt">Golsa Nazari sketches for orchestra on an instrument played with the hands. The habits of a player&rsquo;s technique carried into composition, and which scales she reaches for when the sound is no longer a handpan.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
 
-      <span class="piece-sub">Cut</span>
-      <ul class="legal-list">
-        <li><b>The Submissions clause,</b> <span>which is the one actively working against the company. It states that anything a user posts becomes Soundventure's property, free to exploit commercially. Read against the Scale Gallery, that claims ownership of scales players made. It should be a licence: the player keeps the scale, Neotone gets the right to host, display and distribute it, and can say so in one sentence.</span></li>
-        <li><b>Message boards and registration requirements.</b> <span>Neither exists on this site.</span></li>
-        <li><b>Blanket exclusion of all liability and all warranties.</b> <span>Largely unenforceable against consumers here, so it buys little and reads as hostile from a company whose whole argument is that it is serious.</span></li>
-        <li><b>The prohibition on saving or printing pages.</b> <span>Unenforceable, and strange on a site built to be read.</span></li>
-      </ul>
+      <article class="feed-item" id="loud-room">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Craft</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">&ldquo;Where using a microphone is nearly impossible&rdquo;</a></h2>
+        <p class="feed-excerpt">An acoustic handpan is one of the hardest instruments to put through a PA. A condenser hears the whole stage; a pickup hears the wrong thing. A live-looping didgeridoo player and a bass-music producer hit the same wall from opposite directions.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
 
-      <span class="piece-sub">Fix or add</span>
-      <ul class="legal-list">
-        <li><b>Governing law and venue:</b> <span>Hungary, and a named court, with the note that consumers keep the protections of their own country.</span></li>
-        <li><b>Who publishes this site,</b> <span>in a line: registered name, seat, registration number, contact.</span></li>
-        <li><b>Editorial content is the company's,</b> <span>and quotation with attribution is welcome. Cheaper to say than to litigate, and it matches how the writing is meant to travel.</span></li>
-        <li><b>Scale Gallery rules,</b> <span>if they live anywhere: what may be shared, what happens when a scale is unshared, and the fact that a copy already added to someone's list stays with them. The software already behaves this way; nothing states it.</span></li>
-        <li><b>The company name spelled correctly.</b> <span></span></li>
-      </ul>
-    </section>
+      <article class="feed-item" id="two-players">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Studio</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">&ldquo;While someone else plays the instrument&rdquo;</a></h2>
+        <p class="feed-excerpt">Cam Steen runs the instrument through a chain of effects, live, while another player plays it. One instrument, two musicians, and a piece of music neither of them is fully in charge of.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
 
-  </article>
+  </div>
+
+  <div class="feed-end">
+    <div class="feed-end-inner">
+
+      <button class="load-more" onclick="loadMore()">Load more</button>
+
+      <div class="subscribe">
+        <span class="subscribe-label">Mailing list</span>
+        <p>Updates from the Neotone workshop</p>
+        <form class="subscribe-form" onsubmit="handleSubscribe(event)">
+          <input type="email" placeholder="Email" required />
+          <button type="submit" aria-label="Subscribe">&rarr;</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
 
   <footer class="site-footer">
     <div class="footer-inner">
@@ -417,7 +457,7 @@
        belong to none. It marks the current section. With the sections on screen
        the whole way down there is nothing to return from, which removes most of
        the machinery v2 needed. */
-    const SECTION = '';
+    const SECTION = 'tonefield';
 
     const nav      = document.querySelector('nav');
     const navInner = document.querySelector('.nav-inner');
@@ -539,6 +579,21 @@
     updateNav();
 
     /* ---- Footer ---- */
+
+    /* A notice board, not a newsletter, and not the Tonefield subscription:
+       that is a publication and would be its own list. Nothing on One, where an
+       email field beside a five-figure order reads as a lead form. */
+    function handleSubscribe(e) {
+      e.preventDefault();
+      const value = e.target.querySelector('input').value;
+      alert("Mailing list sign-up. Not wired up yet.");
+      e.target.reset();
+    }
+
+    function loadMore() {
+      alert("Loads the next pieces. Not mocked up yet.");
+    }
+
     /* Footer section links rise before they leave. At the bottom of a page the
        bar is collapsed to a label, so navigating straight away would cut to a
        page with the menu already open. Scrolling up first lets it unfold on the
@@ -569,6 +624,11 @@
       });
     });
 
+    function pieceLink(e) {
+      e.preventDefault();
+      alert("Piece not drafted yet.");
+    }
+
     function handleSearch(e) {
       e.preventDefault();
       alert("Site search. Not mocked up yet.");
@@ -585,6 +645,34 @@
         : name + " page. Not mocked up yet.");
     }
 
+
+
+    /* ---- Scroll restoration ----
+       Opening a piece stores the container's position. The article's masthead
+       return sets a flag naming this page, and only that flag triggers a
+       restore, so arriving fresh from the nav still lands at the top. */
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    const SCROLL_KEY = 'neotone_scroll_' + SECTION;
+    const RESTORE_KEY = 'neotone_restore';
+
+    document.querySelectorAll('.feed-item a[href]').forEach(a => {
+      const href = a.getAttribute('href');
+      if (!href || href === '#') return;
+      a.addEventListener('click', () => {
+        sessionStorage.setItem(SCROLL_KEY, String(Math.round(window.scrollY)));
+      });
+    });
+
+    if (sessionStorage.getItem(RESTORE_KEY) === SECTION) {
+      const y = parseFloat(sessionStorage.getItem(SCROLL_KEY) || '0');
+      if (y > 0) {
+        // immediately, because this script runs after layout; the frame after is
+        // only a re-apply in case late content shifts the page under us
+        window.scrollTo(0, y);
+        requestAnimationFrame(() => { window.scrollTo(0, y); updateNav(); });
+      }
+      sessionStorage.removeItem(RESTORE_KEY);
+    }
 
   </script>
 

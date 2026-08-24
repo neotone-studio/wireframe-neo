@@ -312,8 +312,8 @@
     <div class="nav-inner">
       <div class="masthead" role="presentation"><img src="media/wordmark/neotone.svg" alt="Neotone"></div>
       <div class="sections">
-        <a href="index.html" data-section="tonefield">Tonefield</a>
-        <a href="instrument.html" data-section="instruments">Instruments</a>
+        <a href="index.html" data-section="instruments">Instruments</a>
+        <a href="tonefield.html" data-section="tonefield">Tonefield</a>
       </div>
     </div>
   </nav>
@@ -335,7 +335,7 @@
       <article class="feed-item" id="u-1000">
         <span class="feed-date">12 August 2026</span>
         <h2 class="feed-title"><a href="#">The thousandth instrument</a></h2>
-        <p class="feed-excerpt">We have just finished our 1,000th Neotone. The first one is 828 days old and still playing. Between them, the thousand have reached 62 countries and registered 418 million strikes. Thank you to everyone who has been part of that. The pieces the occasion produced are in <a href="index.html">Tonefield</a>, and the people who built them are <a href="#">here</a>.</p>
+        <p class="feed-excerpt">We have just finished our 1,000th Neotone. The first one is 828 days old and still playing. Between them, the thousand have reached 62 countries and registered 418 million strikes. Thank you to everyone who has been part of that. The pieces the occasion produced are in <a href="tonefield.html">Tonefield</a>, and the people who built them are <a href="#">here</a>.</p>
         <a class="feed-more" href="#">Read the update &rarr;</a>
       </article>
 
@@ -375,8 +375,8 @@
 
       <div class="footer-top">
         <div class="footer-sections">
-          <a href="index.html">Tonefield</a>
-          <a href="instrument.html">Instruments</a>
+          <a href="index.html">Instruments</a>
+          <a href="tonefield.html">Tonefield</a>
         </div>
         <form class="footer-search" onsubmit="handleSearch(event)">
           <input type="search" placeholder="Search" />
@@ -571,7 +571,7 @@
       link.addEventListener('click', e => {
         e.preventDefault();
         const href = link.getAttribute('href');
-        const here = location.pathname.split('/').pop() || 'index.html';
+        const here = location.pathname.split('/').pop() || 'tonefield.html';
         /* Already here: just go back to the top and let the bar reopen. */
         if (href === here) { scrollToTopThen(null); return; }
         scrollToTopThen(() => { window.location.href = href; });

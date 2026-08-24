@@ -235,15 +235,15 @@
     <div class="nav-inner">
       <div class="masthead" role="presentation"><img src="media/wordmark/neotone.svg" alt="Neotone"></div>
       <div class="sections">
-        <a href="index.html" data-section="tonefield">Tonefield</a>
-        <a href="instrument.html" data-section="instruments">Instruments</a>
+        <a href="index.html" data-section="instruments">Instruments</a>
+        <a href="tonefield.html" data-section="tonefield">Tonefield</a>
       </div>
     </div>
   </nav>
 
   <div class="instrument-row">
     <div class="names" role="navigation" aria-label="Instruments">
-      <a href="instrument.html" class="current">One</a>
+      <a href="index.html" class="current">One</a>
       <a href="anima.html">Anima</a>
       <a href="treangle.html">Treangle</a>
     </div>
@@ -261,7 +261,7 @@
             <span>Total</span><span id="checkout-total-amount"></span>
           </div>
           <p id="checkout-empty" class="checkout-empty" style="display: none; margin-top: 10px;">
-            Your selection is empty. <a class="back-link" href="instrument.html">Browse instruments &rarr;</a>
+            Your selection is empty. <a class="back-link" href="index.html">Browse instruments &rarr;</a>
           </p>
         </div>
       </div>
@@ -302,8 +302,8 @@
 
       <div class="footer-top">
         <div class="footer-sections">
-          <a href="index.html">Tonefield</a>
-          <a href="instrument.html">Instruments</a>
+          <a href="index.html">Instruments</a>
+          <a href="tonefield.html">Tonefield</a>
         </div>
         <form class="footer-search" onsubmit="handleSearch(event)">
           <input type="search" placeholder="Search" />
@@ -486,7 +486,7 @@
       link.addEventListener('click', e => {
         e.preventDefault();
         const href = link.getAttribute('href');
-        const here = location.pathname.split('/').pop() || 'index.html';
+        const here = location.pathname.split('/').pop() || 'tonefield.html';
         /* Already here: just go back to the top and let the bar reopen. */
         if (href === here) { scrollToTopThen(null); return; }
         scrollToTopThen(() => { window.location.href = href; });
@@ -594,7 +594,7 @@
       alert("Hands off to the payment processor. Not mocked up yet.");
     }
 
-    document.querySelector('.back-link').href = 'instrument.html';
+    document.querySelector('.back-link').href = 'index.html';
     document.getElementById('checkout-country').value = checkoutCountry;
     renderCheckout();
 
