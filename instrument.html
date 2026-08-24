@@ -158,20 +158,19 @@
     .terms-a { margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
 
     /* 7 · Play one first, as a fork. */
-    .paths { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; border-top: 1px solid var(--line); padding-top: 30px; }
-    .path-label {
-      display: block; margin-bottom: 10px;
-      font-size: 11px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.12em; color: var(--muted);
+    .sec-line {
+      margin: 0 auto 48px; max-width: 860px; text-align: center;
+      font-size: 25px; font-weight: 400; line-height: 1.4; letter-spacing: -0.01em;
     }
-    .path-text { margin: 0 0 14px; font-size: 15px; line-height: 1.65; }
+    .way-title { margin: 0 0 12px; font-size: 21px; font-weight: 400; letter-spacing: -0.01em; }
+    .way-text { margin: 0 0 16px; font-size: 15px; line-height: 1.7; }
     .path-cta { font-size: 14px; cursor: pointer; }
     .path-cta:hover { text-decoration: underline; }
 
     @media (max-width: 980px) {
       .opening { padding: 32px 0 40px; font-size: 19px; }
       .opening-name { font-size: 28px; }
-      .specs-strip, .steps-strip, .stack, .paths { grid-template-columns: 1fr; }
+      .specs-strip, .steps-strip, .stack { grid-template-columns: 1fr; }
       .spec-cell, .step-cell { border-right: none; border-bottom: 1px solid var(--line); padding-left: 0; }
       .spec-cell:last-child, .step-cell:last-child { border-bottom: none; }
     }
@@ -218,14 +217,16 @@
     }
     .tab {
       flex: 1; border: none; border-right: 1px solid var(--line);
-      background: #fff; padding: 12px 16px; text-align: left;
-      cursor: pointer; font-size: 13px; font-family: Arial, Helvetica, sans-serif; font-weight: 700;
+      background: #fff; padding: 18px 20px; text-align: left;
+      cursor: pointer; font-family: Arial, Helvetica, sans-serif;
     }
     .tab:last-child { border-right: none; }
-    .tab.active { background: #f7f7f7; }
+    .tab.active { background: #f7f7f7; box-shadow: inset 0 2px 0 var(--ink); }
+    .tab-title { display: block; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .tab-desc { display: block; font-size: 12px; color: var(--muted); line-height: 1.5; }
     .panel { padding: 0; }
     .panel-intro {
-      font-family: Georgia, serif; font-size: 15px; line-height: 1.7;
+      font-size: 15px; line-height: 1.7;
       margin: 0 auto 24px; max-width: 560px; color: var(--ink);
     }
 
@@ -360,7 +361,7 @@
       display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
     }
     .sel-item-info { flex: 1; }
-    .sel-item-name { margin: 0 0 3px; font-size: 13px; font-weight: 400; font-family: Georgia, serif; }
+    .sel-item-name { margin: 0 0 3px; font-size: 13px; font-weight: 400; }
     .sel-item-detail { margin: 0 0 5px; font-size: 11px; color: var(--muted); }
     .sel-item-price { margin: 0; font-size: 12px; }
     .sel-remove {
@@ -497,6 +498,110 @@
     @media (prefers-reduced-motion: reduce) {
       .opening-wrap { animation: none; }
     }
+    .editorial-pull {
+      margin: 1.4em 0; padding-left: 1.25rem;
+      border-left: 1px solid var(--line);
+      font-size: 21px; font-style: italic; line-height: 1.5; color: var(--muted);
+    }
+    .sec.neos { border: 1px solid var(--line); padding: 0; }
+    .neos-bar {
+      background: var(--ink); color: #fff; padding: 10px 40px;
+      font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .neos-body { padding: 30px 40px 34px; }
+    .neos-links { margin-top: 20px; display: flex; gap: 28px; flex-wrap: wrap; }
+    .ref-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; }
+    .ref-note a { border-bottom: 1px solid var(--line); }
+    .ref-note a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .network { margin-top: 44px; }
+    .artists-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .artist-card { border: 1px solid var(--line); display: flex; flex-direction: column; }
+    .artist-img { width: 100%; height: 180px; background: var(--line); flex-shrink: 0; }
+    .artist-card-body { padding: 12px; flex: 1; }
+    .artist-name { margin: 0 0 3px; font-size: 13px; font-weight: 700; font-family: Arial, Helvetica, sans-serif; }
+    .artist-desc { margin: 0 0 6px; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; line-height: 1.4; }
+    .session-status {
+      display: inline-block; font-size: 10px; font-family: Arial, Helvetica, sans-serif;
+      padding: 2px 7px; border: 1px solid var(--line);
+    }
+    .session-status.available { border-color: #333; }
+    .session-status.unavailable { color: #aaa; }
+    .artist-expand {
+      display: block; text-align: right; margin-top: 10px;
+      font-size: 11px; font-family: Arial, Helvetica, sans-serif;
+      cursor: pointer; background: none; border: none; padding: 0; color: var(--muted);
+    }
+    .artist-expand:hover { text-decoration: underline; }
+    .artist-detail { padding: 0 12px 12px; display: none; border-top: 1px solid var(--line); margin-top: 10px; }
+    .artist-detail.open { display: block; }
+    .artist-links { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .artist-link-btn {
+      border: 1px solid var(--line); background: #fff; padding: 5px 9px;
+      font-size: 11px; font-family: Arial, Helvetica, sans-serif; cursor: pointer;
+    }
+    .opt-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .artist-extra { display: none; }
+    .show-all-btn {
+      display: block; width: 100%; margin-top: 14px; padding: 10px;
+      border: 1px solid var(--line); background: #fff; text-align: center;
+      font-size: 12px; font-family: Arial, Helvetica, sans-serif;
+      cursor: pointer; color: var(--muted);
+    }
+    .show-all-btn:hover { border-color: #aaa; color: var(--ink); }
+    .subscribe { max-width: 620px; margin: 0 auto; }
+    .subscribe-label {
+      display: block; margin-bottom: 12px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted);
+    }
+    .subscribe p { margin: 0 0 22px; font-size: 17px; line-height: 1.75; }
+    .subscribe-archive { color: var(--muted); border-bottom: 1px solid var(--line); }
+    .subscribe-archive:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .subscribe-form { display: flex; align-items: center; max-width: 420px; }
+    .subscribe-form input {
+      flex: 1; min-width: 0; background: none; color: var(--ink);
+      border: none; border-bottom: 1px solid var(--line);
+      padding: 8px 0; font-size: 15px; font-family: inherit;
+    }
+    .subscribe-form input::placeholder { color: var(--muted); }
+    .subscribe-form input:focus { outline: none; border-bottom-color: var(--ink); }
+    .subscribe-form button {
+      background: none; border: none; border-bottom: 1px solid var(--line);
+      color: var(--muted); padding: 8px 0 8px 16px;
+      font-size: 15px; font-family: inherit; cursor: pointer;
+    }
+    .subscribe-form button:hover { color: var(--ink); }
+    @media (max-width: 980px) { .artists-grid { grid-template-columns: 1fr; } .sec.neos { padding: 24px 20px; } }
+    .piece-media { margin: 0 0 88px; }
+    .lead-box { width: 100%; aspect-ratio: 2.4 / 1; background: #ededed; }
+    .diagram-caption { max-width: 860px; margin: 12px auto 0; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; text-align: center; }
+    .neos-doors { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .neos-door { display: block; border: 1px solid var(--line); padding: 14px 16px; }
+    .neos-door:hover .door-title { text-decoration: underline; }
+    .door-kind { display: block; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-family: Arial, Helvetica, sans-serif; margin-bottom: 6px; }
+    .door-title { display: block; font-size: 15px; margin-bottom: 4px; }
+    .door-desc { display: block; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; line-height: 1.5; }
+    .q-block { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); max-width: 560px; }
+    .q-label { margin: 0 0 6px; font-size: 13px; font-weight: 700; font-family: Arial, Helvetica, sans-serif; }
+    .q-desc { margin: 0 0 12px; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; }
+    .card-single { max-width: 480px; margin: 44px auto 0; }
+    .card-single .stack-img { aspect-ratio: 16 / 9; }
+    .stack-desc { margin: 4px 0 0; font-size: 13px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; line-height: 1.5; }
+    .spec-cell { cursor: pointer; }
+    .spec-cell.active { outline: 1px solid var(--ink); outline-offset: -1px; }
+    .spec-diagram-box {
+      grid-column: 1 / -1; width: 100%; margin-top: 24px; aspect-ratio: 2.8 / 1;
+      background: #f3f3f3; border: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .spec-diagram-note { max-width: 420px; padding: 0 24px; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; text-align: center; line-height: 1.6; }
+    .path-card { display: block; margin-top: 24px; max-width: 420px; }
+    .path-card .stack-img { aspect-ratio: 16 / 9; }
+    .way { max-width: 620px; margin: 0 auto 72px; text-align: center; }
+    .way:last-of-type { margin-bottom: 0; }
+    .way .path-card { margin: 32px auto 0; text-align: left; }
+    .terms-box { border: 1px solid var(--line); padding: 22px 26px; max-width: 620px; }
   </style>
 </head>
 <body>
@@ -526,35 +631,45 @@
     <!-- 1 · Opening -->
     <div class="opening-wrap">
     <h1 class="opening">The <span class="opening-name">Neotone One</span> is handcrafted in Budapest, built to order</h1>
+    <!-- Lead media, grid width, as a piece opens. The page never showed the
+         object before asking for the order. -->
+    <figure class="piece-media">
+      <div class="lead-box"></div>
+      <figcaption class="diagram-caption">Lead image: the instrument, perhaps in a scene. Image or interactive image; the designer&rsquo;s space.</figcaption>
+    </figure>
     </div>
 
     <!-- 2 · Orientation -->
     <section class="sec editorial">
-      <p class="editorial-text">Roughly 120 words introducing the instrument concretely: its shape, its material, the serial number it carries. Plain prose in a single measure, no heading. It assumes the reader arrived knowing what a Neotone One is, so it orients rather than persuades.</p>
+      <p class="editorial-text">Roughly 120 words introducing the instrument concretely: its shape, its material, the serial number it carries. Plain prose in a single measure, no heading.</p>
+      <p class="editorial-pull">&ldquo;Pull quote that gives visual emphasis and draws the reader deeper into the instrument.&rdquo;</p>
+      <p class="editorial-text">A second short paragraph describing what comes with the instrument: warranty, what the order process looks like, a brief orientation to key features before the reader moves into the order section.</p>
+      <p class="editorial-text">Whether it is for you is a question the artists have answered in their own words: <a href="#" onclick="pieceLink(event)">Who is the Neotone for?</a></p>
     </section>
 
     <!-- 3 · Specs strip -->
     <section class="sec specs-strip">
-      <div class="spec-cell">
+      <div class="spec-cell" onclick="specFocus(this, 'Material')">
         <span class="spec-label">Material</span>
         <span class="spec-value">Hand selected instrument grade hardwood</span>
       </div>
-      <div class="spec-cell">
+      <div class="spec-cell" onclick="specFocus(this, 'Sound')">
         <span class="spec-label">Sound</span>
         <span class="spec-value">Cor sound engine, samples from world-class instruments</span>
       </div>
-      <div class="spec-cell">
+      <div class="spec-cell" onclick="specFocus(this, 'Control')">
         <span class="spec-label">Control</span>
         <span class="spec-value">20 tonefields, gesture resolution, fully assignable</span>
       </div>
-      <div class="spec-cell">
+      <div class="spec-cell" onclick="specFocus(this, 'Scales')">
         <span class="spec-label">Scales</span>
         <span class="spec-value">Unlimited, including harmonics, crosstalk, and articulation</span>
       </div>
-      <div class="spec-cell">
+      <div class="spec-cell" onclick="specFocus(this, 'Lead time')">
         <span class="spec-label">Lead time</span>
         <span class="spec-value">~60 days, or stock available immediately</span>
       </div>
+      <div class="spec-diagram-box"><span class="spec-diagram-note" id="spec-diagram-caption">Interactive diagram: select a spec above and the corresponding part of the instrument highlights.</span></div>
     </section>
 
     <!-- 3b · neOS. The software is part of the instrument today, so it is
@@ -563,28 +678,48 @@
          sibling called Software. Until then this block is where a reader learns
          the name. -->
     <section class="sec neos">
-      <span class="sec-label">neOS</span>
-      <p class="neos-text">Every Neotone One runs <span class="neos-name">neOS</span>, the software that holds its scales, its gallery and its settings. It is where scales are built and shared, and it updates over the air, so an instrument keeps changing after it leaves the workshop. It comes with the instrument. The <a href="manual.html">manual</a> covers both.</p>
+      <div class="neos-bar">neOS</div>
+      <div class="neos-body">
+        <p class="neos-text">Every Neotone One runs <span class="neos-name">neOS</span>, the software that holds its scales, its gallery and its settings. It is where scales are built and shared, and it updates over the air, so an instrument keeps changing after it leaves the workshop. It comes with the instrument.</p>
+        <div class="neos-doors">
+        <a class="neos-door" href="manual.html">
+          <span class="door-kind">Reference</span>
+          <span class="door-title">The manual</span>
+          <span class="door-desc">Every control, in three depths.</span>
+        </a>
+        <a class="neos-door" href="manual-scales.html">
+          <span class="door-kind">Walkthrough</span>
+          <span class="door-title">Scales</span>
+          <span class="door-desc">Build one, guided, in a few minutes.</span>
+        </a>
+        <a class="neos-door" href="neos-note-names.html">
+          <span class="door-kind">The idea</span>
+          <span class="door-title">Why the note names change as you build</span>
+          <span class="door-desc">In Tonefield.</span>
+        </a>
+      </div>
+      </div>
     </section>
 
     <!-- 4 · Order fork -->
     <section class="block" style="padding: 0; overflow: hidden; margin-bottom: 14px;">
 
-      <div class="instrument-preview sans">
-        <span class="instrument-preview-label">Your Instrument</span>
-        <span class="instrument-preview-caption" id="selection-caption">Built to Order &middot; Mahogany</span>
-      </div>
-
       <div class="tabs sans">
-        <button class="tab" id="tab-stock" onclick="switchFork('stock')">From Stock</button>
-        <button class="tab active" id="tab-build" onclick="switchFork('build')">Built to Order</button>
+        <button class="tab active" id="tab-build" onclick="switchFork('build')">
+          <span class="tab-title">Built to Order</span>
+          <span class="tab-desc">Built for you in Budapest. About six weeks.</span>
+        </button>
+        <button class="tab" id="tab-stock" onclick="switchFork('stock')">
+          <span class="tab-title">From Stock</span>
+          <span class="tab-desc">Finished instruments at the workshop, ready to ship.</span>
+        </button>
       </div>
 
       <div style="padding: 16px;">
 
         <!-- Built to Order -->
         <div id="panel-build" class="panel">
-          <p class="panel-intro">The order journey continues here. Select your wood below and the instrument preview above will update. Enter your details, then proceed to a deposit to confirm your place in the build queue.</p>
+          <p class="panel-intro">Choose the wood. A deposit confirms your place in the build queue.</p>
 
           <div class="material-grid">
             <div class="material-card" id="wood-ash" onclick="selectWood('Ash',0)">
@@ -650,6 +785,7 @@
                     <button class="opt" onclick="applyCode()">Apply</button>
                   </div>
                   <p id="refmsg" class="block-desc" style="font-size:11px; margin-top:3px;">No code applied.</p>
+                  <p class="ref-note">Codes come from artist sessions.</p>
                 </div>
               </div>
               <div class="sum-post">
@@ -666,20 +802,11 @@
               <button class="acc-show-btn" onclick="toggleAccessories(this)">Show more accessories &darr;</button>
             </div>
           </div>
-
-          <div class="talk-block sans">
-            <p class="block-label">Questions?</p>
-            <p class="block-desc" style="margin-top:4px;">Send a message and someone from the workshop will reply.</p>
-            <input class="field" style="margin-top:8px;" placeholder="Your name" />
-            <input class="field" placeholder="Email" />
-            <textarea class="field" rows="3" placeholder="Your question or message" style="resize:vertical;"></textarea>
-            <button class="opt" style="margin-top:8px;">Send message</button>
-          </div>
         </div>
 
         <!-- From Stock -->
         <div id="panel-stock" class="panel hidden">
-          <p class="panel-intro">Each stock instrument is a specific, complete object with its own history. The order journey continues here by selecting an instrument below, then entering your details.</p>
+          <p class="panel-intro">Each stock instrument is a specific, complete object with its own history. Select one below.</p>
 
           <div id="stock-available">
             <div class="stock-grid">
@@ -748,6 +875,7 @@
                     <button class="opt" onclick="applyStockCode()">Apply</button>
                   </div>
                   <p id="stock-refmsg" class="block-desc" style="font-size:11px; margin-top:3px;">No code applied.</p>
+                  <p class="ref-note">Codes come from artist sessions.</p>
                 </div>
               </div>
               <div class="sum-post">
@@ -774,38 +902,13 @@
               <span class="subscribe-confirm">You're on the list</span>
             </form>
           </div>
-
-          <div class="talk-block sans">
-            <p class="block-label">Questions?</p>
-            <p class="block-desc" style="margin-top:4px;">Send a message and someone from the workshop will reply.</p>
-            <input class="field" style="margin-top:8px;" placeholder="Your name" />
-            <input class="field" placeholder="Email" />
-            <textarea class="field" rows="3" placeholder="Your question or message" style="resize:vertical;"></textarea>
-            <button class="opt" style="margin-top:8px;">Send message</button>
-          </div>
         </div>
 
       </div>
     </section>
 
-    <!-- 5 · The instrument's own pieces. Same tab: they belong to this section. -->
-    <section class="sec">
-      <span class="sec-label">Read further</span>
-      <div class="stack stack-two">
-        <a class="stack-card" href="#" onclick="pieceLink(event)">
-          <div class="stack-img"></div>
-          <span class="stack-kicker">Asked of every artist</span>
-          <p class="stack-title">Who is the Neotone for?</p>
-        </a>
-        <a class="stack-card" href="#" onclick="pieceLink(event)">
-          <div class="stack-img"></div>
-          <span class="stack-kicker">The people and the process</span>
-          <p class="stack-title">Every instrument starts with a conversation</p>
-        </a>
-      </div>
-    </section>
-
-    <!-- 6 · What happens next, with purchase terms -->
+    <!-- 5 · What happens next, with purchase terms. Beside the fork,
+         because terms belong next to the ask. -->
     <section class="sec">
       <span class="sec-label">What happens next</span>
       <div class="steps-strip">
@@ -827,29 +930,231 @@
         <div class="step-cell">
           <span class="step-number">4</span>
           <p class="step-title">Delivery</p>
-          <p class="step-desc">Your instrument will arrive with documentation, warranty, and setup guidance.</p>
+          <p class="step-desc">Your instrument will arrive with its <a href="manual.html">manual</a>, warranty, and setup guidance.</p>
         </div>
       </div>
-      <div class="terms">
+      <div class="terms terms-box">
         <p class="terms-q">Can I change my mind?</p>
         <p class="terms-a">Yes, at any point. Before your instrument is built, during production, or within two weeks of delivery. Cancel or return for a full refund, no explanation required.</p>
       </div>
+      <div class="q-block">
+        <p class="q-label">Questions?</p>
+        <p class="q-desc">Anything the page has not covered. Someone from the workshop replies.</p>
+        <input class="field" placeholder="Your name" />
+        <input class="field" placeholder="Email" />
+        <textarea class="field" rows="3" placeholder="Your question or message" style="resize:vertical;"></textarea>
+        <button class="opt" style="margin-top:8px;" onclick="alert('Sends to the workshop inbox. Not wired up yet.')">Send</button>
+      </div>
     </section>
 
-    <!-- 7 · Play one first -->
-    <section class="sec">
+    <!-- 6 · Play one first: the retail network. Neotone has no shops, so the
+         people below are where the instrument can be met. Shops join the same
+         grid the day a partnership is real, and not before. -->
+    <section class="sec" id="play-one">
       <span class="sec-label">Play one first</span>
-      <div class="paths">
-        <div>
-          <span class="path-label">Visit the workshop</span>
-          <p class="path-text">Our full instrument stock, available to play. Sessions are by appointment and unhurried. Write to arrange a time, bring an afternoon.</p>
-          <a class="path-cta" onclick="alert('Opens an email to the workshop. Not wired up yet.')">Write to us &rarr;</a>
+      <p class="sec-line">If you&rsquo;d like to play a Neotone One in person, there are two ways.</p>
+      <div class="way">
+        <h3 class="way-title">Visit the workshop</h3>
+        <p class="way-text">Our full stock, available to play. Sessions are by appointment and unhurried. Write to arrange a time, bring an afternoon.</p>
+        <a class="path-cta" onclick="alert('Opens an email to the workshop. Not wired up yet.')">Write to us &rarr;</a>
+        <a class="stack-card path-card" href="#" onclick="pieceLink(event)">
+          <div class="stack-img"></div>
+          <p class="stack-title">Every instrument starts with a conversation</p>
+          <p class="stack-desc">Read about the workshop: the production line, told through the twelve people who run it.</p>
+        </a>
+      </div>
+      <div class="way" id="artist-directory">
+        <h3 class="way-title">Reach out to a Neotone artist</h3>
+        <p class="way-text">Artists host sessions in their studios and homes around the world; some answer questions over a call, in your language. Sessions are free, and if you order afterwards your host&rsquo;s code takes five percent off and credits them.</p>
+      </div>
+      <div class="network">
+    <div class="opt-row sans">
+      <button class="opt active" onclick="filterArtists('all',this)">All</button>
+      <button class="opt" onclick="filterArtists('europe',this)">Europe</button>
+      <button class="opt" onclick="filterArtists('americas',this)">Americas</button>
+      <button class="opt" onclick="filterArtists('asia',this)">Asia</button>
+      <button class="opt" onclick="filterArtists('sessions',this)">In-person sessions</button>
+    </div>
+    <div id="artists" class="artists-grid">
+
+      <div class="artist-card artist" data-region="europe" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Lena Voss &middot; Germany</p>
+          <p class="artist-desc">Electroacoustic composition and live gesture practice.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-lena', this)">Expand</button>
         </div>
-        <div>
-          <span class="path-label">Artist sessions</span>
-          <p class="path-text">Players around the world who keep an instrument and will sit down with you. Some host in person, some over a call.</p>
-          <a class="path-cta" onclick="alert('Opens the artist directory. Not mocked up yet.')">Find a player &rarr;</a>
+        <div id="artist-lena" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Lena works between acoustic improvisation and electronic processing. Based in Berlin, she teaches instrument practice and runs monthly open sessions.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+            <a class="artist-link-btn" href="#">Soundcloud</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
         </div>
+      </div>
+
+      <div class="artist-card artist" data-region="americas" data-sessions="false">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Rafael Montes &middot; Colombia</p>
+          <p class="artist-desc">Ritual performance and scale-driven improvisation.</p>
+          <button class="artist-expand" onclick="toggleArtist('artist-rafael', this)">Expand</button>
+        </div>
+        <div id="artist-rafael" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Rafael's practice integrates tuning systems from Andean tradition with contemporary gesture. His recordings are available via Bandcamp.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Bandcamp</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist" data-region="asia" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Yuki Tanaka &middot; Japan</p>
+          <p class="artist-desc">Minimalist solo work and spatial listening sessions.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-yuki', this)">Expand</button>
+        </div>
+        <div id="artist-yuki" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Yuki focuses on sustained tones and room acoustics. Based in Kyoto, she hosts small-group listening and instrument sessions by arrangement.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">YouTube</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist" data-region="europe" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Marta Hoffmann &middot; Poland</p>
+          <p class="artist-desc">Improvisation and contemporary compositional practice.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-marta', this)">Expand</button>
+        </div>
+        <div id="artist-marta" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Marta works across composed and improvised forms. Based in Warsaw, she runs regular sessions and is available for workshops and collaborative projects.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist" data-region="americas" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Elena Vasquez &middot; Argentina</p>
+          <p class="artist-desc">Field recording, tuning research, and ensemble work.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-elena', this)">Expand</button>
+        </div>
+        <div id="artist-elena" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Elena's practice draws on acoustic ecology and microtonality. Based in Buenos Aires, she hosts instrument sessions and gives talks on tuning systems.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist artist-sixth" data-region="asia" data-sessions="false">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Hiroshi Naka &middot; South Korea</p>
+          <p class="artist-desc">Electronic texture and extended technique for handpan.</p>
+          <button class="artist-expand" onclick="toggleArtist('artist-hiroshi', this)">Expand</button>
+        </div>
+        <div id="artist-hiroshi" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Hiroshi combines the Neotone One with modular synthesis and live processing. His practice is centred on timbre and spectral density. Virtual sessions by arrangement.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">YouTube</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist artist-extra" data-region="europe" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Anna Svensson &middot; Sweden</p>
+          <p class="artist-desc">Ambient composition and meditative performance practice.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-anna', this)">Expand</button>
+        </div>
+        <div id="artist-anna" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Anna works with long-form ambient pieces and sustained resonance. Based in Gothenburg, she hosts intimate listening sessions in her studio.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Soundcloud</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist artist-extra" data-region="europe" data-sessions="false">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Marco Ferretti &middot; Italy</p>
+          <p class="artist-desc">Solo performance and instrument pedagogy.</p>
+          <button class="artist-expand" onclick="toggleArtist('artist-marco', this)">Expand</button>
+        </div>
+        <div id="artist-marco" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Marco teaches instrument practice and has developed a method for integrating handpan techniques with the Neotone One. Virtual sessions available.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist artist-extra" data-region="asia" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Sung-Ah Kim &middot; Taiwan</p>
+          <p class="artist-desc">Cross-cultural improvisation and collaborative sound work.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-sungah', this)">Expand</button>
+        </div>
+        <div id="artist-sungah" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Sung-Ah performs and teaches across East Asia, working between traditional Korean forms and contemporary improvised practice. Sessions held in Taipei.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <button class="show-all-btn" id="show-all-btn" onclick="toggleShowAll(this)">Show all artists</button>
+      </div>
+      <div class="card-single">
+        <a class="stack-card" href="#" onclick="pieceLink(event)">
+          <div class="stack-img"></div>
+          <p class="stack-title">Who is the Neotone for?</p>
+          <p class="stack-desc">The question, answered by the artists in their own words.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- 7 · Mailing list, the same component as the feed's end -->
+    <section class="sec">
+      <div class="subscribe">
+        <span class="subscribe-label">Mailing list</span>
+        <p>Updates from the Neotone workshop</p>
+        <form class="subscribe-form" onsubmit="handleSubscribe(event)">
+          <input type="email" placeholder="Email" required />
+          <button type="submit" aria-label="Subscribe">&rarr;</button>
+        </form>
       </div>
     </section>
   </main>
@@ -896,8 +1201,7 @@
 
       <div class="footer-band">
         <div class="footer-utility">
-          <a onclick="utilityLink(\'Workshop\')">Workshop</a>
-          <a href="manual.html">Manual</a>
+          <a onclick="utilityLink('Workshop')">Workshop</a>
           <a href="updates.html">Updates</a>
           <a onclick="utilityLink('Contact')">Contact</a>
           <a href="legal.html">Legal</a>
@@ -1215,6 +1519,7 @@
 
     function updateCaption() {
       var el = document.getElementById("selection-caption");
+      if (!el) return;
       if (state.orderMode === "stock") {
         el.textContent = state.stockSelection ? "From Stock · " + state.stockSelection : "From Stock · Select an instrument below";
       } else {
@@ -1419,6 +1724,48 @@
     changeVATCountry(vatCountry);
     updateCaption();
     renderSelection();
+
+    var currentFilter = "all";
+    var showAllActive = false;
+
+      function filterArtists(filter, button) {
+      currentFilter = filter;
+      document.querySelectorAll(".artist").forEach(function(card) {
+        var isExtra = card.classList.contains("artist-extra");
+        var isSixth = card.classList.contains("artist-sixth") && window.innerWidth <= 980;
+        if (!showAllActive && (isExtra || isSixth)) { card.style.display = "none"; return; }
+        var show = filter === "all"
+          || (filter === "sessions" && card.getAttribute("data-sessions") === "true")
+          || card.getAttribute("data-region") === filter;
+        card.style.display = show ? "flex" : "none";
+      });
+      document.querySelectorAll(".opt-row .opt").forEach(function(b) { b.classList.remove("active"); });
+      if (button) button.classList.add("active");
+    }
+
+    function toggleShowAll(btn) {
+      showAllActive = !showAllActive;
+      var activeBtn = document.querySelector(".opt-row .opt.active");
+      filterArtists(currentFilter, activeBtn);
+      btn.textContent = showAllActive ? "Show fewer" : "Show all artists";
+    }
+
+    function toggleArtist(id, btn) {
+      var detail = document.getElementById(id);
+      detail.classList.toggle("open");
+      btn.textContent = detail.classList.contains("open") ? "Collapse" : "Expand";
+    }
+
+    function handleSubscribe(e) {
+      e.preventDefault();
+      alert("Mailing list sign-up. Not wired up yet.");
+    }
+
+    function specFocus(cell, label) {
+      document.querySelectorAll(".spec-cell").forEach(function(c){ c.classList.remove("active"); });
+      cell.classList.add("active");
+      document.getElementById("spec-diagram-caption").textContent = "Highlighting: " + label + ".";
+    }
 
     function pieceLink(e) {
       e.preventDefault();
