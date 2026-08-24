@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Legal · Neotone</title>
+  <style>
+    :root { --ink: #111; --line: #d9d9d9; --muted: #4f4f4f; --green: #2a7a2a; --max: 1180px; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    a { color: inherit; text-decoration: none; }
+
+    body { background: #fff; color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+
+    /* ---- Masthead ----
+       Neotone sits above the sections rather than beside them, which is the
+       whole point of v3: the company is the umbrella, and Culture, Instrument
+       and Craft are what it consists of.
+
+       Two states. At the top of a page the mark is centred with the sections
+       beneath it. Once you scroll, the bar collapses to a single row: small
+       mark on the left, sections on the right. The sections stay reachable the
+       whole way down, which the v2 nav could not do, since scrolling there
+       left only the return. */
+    /* ---- Masthead ----
+       Fixed height, contents positioned absolutely, and every moving value
+       driven by scroll position rather than by a timed transition. The bar is
+       therefore never mid-animation: where it sits is a function of how far
+       down the page you are. */
+    nav {
+      position: sticky; top: 0; z-index: 10;
+      background: #fff;
+      height: 118px;
+      /* Clipped left, right and top, open at the bottom. The row travels left as
+         you scroll and the items behind the current one go to negative x, which
+         would otherwise widen the page. overflow: hidden did that job but also
+         cut off the Instruments submenu, which hangs below the bar, and CSS
+         cannot clip one axis while leaving the other visible. */
+      clip-path: inset(0 0 -320px 0);
+    }
+    .nav-inner {
+      position: relative;
+      max-width: var(--max); margin: 0 auto; padding: 0 48px;
+      height: 100%;
+    }
+
+    .masthead {
+      position: absolute; left: 50%; top: 30px;
+      transform: translateX(-50%);
+      transform-origin: left center;
+      cursor: pointer;
+      will-change: transform, top;
+    }
+    .masthead img { height: 40px; width: auto; display: block; }
+
+    /* The row keeps its width the whole way down. Rather than folding items out
+       of the flow, which changes the width and makes the target move, the row
+       slides until the section you are in reaches the boundary. The others
+       travel with it and fade out. */
+    .sections {
+      position: absolute; left: 50%; top: 86px;
+      transform: translateX(-50%);
+      display: flex; align-items: baseline;
+      will-change: transform, top;
+    }
+    .sections a {
+      font-size: 14px; letter-spacing: 0.02em; color: var(--muted);
+      cursor: pointer; margin-left: 30px; white-space: nowrap;
+      /* No colour transition. Everything in this bar is a function of scroll
+         position, and a 200ms ease made the emphasis lag the scroll. */
+    }
+    .sections a:first-child { margin-left: 0; }
+
+
+    .sections a:hover { color: var(--ink); }
+    /* Emphasis on where you are: ink rather than grey, with a hairline under
+       it. Quiet enough to sit in a centred row of three, clear enough to read
+       as a position rather than as a hover state. */
+    .sections a {
+      padding-bottom: 4px;
+      border-bottom: 1px solid transparent;
+    }
+    .sections a.current {
+      color: var(--ink);
+      border-bottom-color: var(--ink);
+    }
+
+    @media (max-width: 980px) {
+      .nav-inner { padding: 0 24px; }
+      .sections a { margin-left: 20px; }
+    }
+
+    /* Blocks size to their content rather than the viewport. The 115vh height
+       came from the original mockup, where each article filled a screen during
+       the colour-change scroll; without that mechanic it only pushed the first
+       article off the bottom edge, so it read as something still to arrive. */
+    .article {
+      width: 100%;
+      padding: 56px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    /* Gap between articles only, never before the first, so article one keeps
+       its position just below the middle of the viewport on load. Measured in
+       vh so the next article is always off the bottom edge and has to be
+       scrolled to, whatever the screen height. */
+    .article + .article { margin-top: 48vh; }
+    /* Adjacent sibling, not :first-of-type: the opening wrapper is also a div,
+       so it would claim first-of-type and this would silently match nothing. */
+    .opening-wrap + .article { padding-top: 116px; }
+    /* Room before the footer, so the last article ends rather than runs into it.
+       last-of-type is safe here: the footer is a <footer>, so the final div
+       sibling is the last article. */
+    .article:last-of-type { padding-bottom: 32vh; }
+
+    .article-label {
+      font-family: sans-serif;
+      font-size: 96px;
+      font-weight: 700;
+      color: rgba(0,0,0,0.15);
+    }
+
+    .article-title {
+      font-family: sans-serif;
+      font-size: 20px;
+      font-weight: 400;
+      color: rgba(0,0,0,0.4);
+      letter-spacing: 0.01em;
+    }
+
+    /* ---- Footer ----
+       Two quiet bands: sections + search, then utility + place. No column
+       headings, no dividers beyond a single hairline. Wraps rather than
+       needing breakpoints. */
+    .site-footer { background: #000; color: #fff; margin-top: 96px; }
+    .footer-inner { max-width: var(--max); margin: 0 auto; padding: 56px 48px; }
+
+    /* Top band restates the structure and holds search. The sections repeat the
+       bar deliberately: at the bottom of a page a reader is deciding what is
+       next, and a list of where they can go is useful even though the same list
+       is above. They also give search a left side, so it can sit right at its
+       own size rather than spanning the measure. */
+    .footer-top {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 32px; flex-wrap: wrap;
+    }
+    .footer-sections { display: flex; align-items: baseline; gap: 22px; flex-wrap: wrap; }
+    .footer-sections a {
+      font-size: 13px; color: #fff; text-decoration: none; cursor: pointer;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .footer-sections a:hover { opacity: 0.55; }
+
+    .footer-search { display: flex; align-items: center; width: 260px; max-width: 100%; }
+    .footer-search input {
+      flex: 1; min-width: 0; background: none; color: #fff;
+      border: none; border-bottom: 1px solid rgba(255,255,255,0.28);
+      padding: 6px 0; font-size: 13px; font-family: inherit;
+    }
+    .footer-search input::placeholder { color: rgba(255,255,255,0.35); }
+    .footer-search input:focus { outline: none; border-bottom-color: rgba(255,255,255,0.7); }
+    .footer-search button {
+      background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.28);
+      color: rgba(255,255,255,0.55); padding: 6px 0 6px 14px;
+      font-size: 14px; font-family: inherit; cursor: pointer;
+    }
+    .footer-search button:hover { color: #fff; }
+
+    .footer-band {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 20px 32px; flex-wrap: wrap;
+      margin-top: 44px; padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .footer-utility { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+    .footer-utility a { font-size: 12px; color: rgba(255,255,255,0.55); text-decoration: none; cursor: pointer; font-family: Arial, Helvetica, sans-serif; }
+    .footer-utility a:hover { color: #fff; }
+
+    .footer-place { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    @media (min-width: 981px) { .footer-place { align-items: flex-end; text-align: right; } }
+    .footer-meta { margin: 0; font-size: 12px; color: rgba(255,255,255,0.38); font-family: Arial, Helvetica, sans-serif; }
+    .footer-social a { color: rgba(255,255,255,0.55); cursor: pointer; }
+    .footer-social a:hover { color: #fff; }
+
+    /* ---- Page opening ----
+       Every page opens with one centred statement of what it is for, with the
+       section's own name inside that sentence rather than above it as a
+       heading. The nav already names the page, so a headline only repeats it.
+       Same gesture on every page, so the whole site reads as written. */
+    /* Entry fade sits on the wrapper, not the heading. The animation uses
+       fill: both, so its final opacity keeps applying and would override the
+       scroll fade below. Two elements, two opacities, composed by the browser. */
+    .opening-wrap { animation: opening-in 760ms ease 140ms both; }
+    @keyframes opening-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .opening {
+      max-width: 720px; margin-left: auto; margin-right: auto;
+      padding: 104px 0 88px; text-align: center;
+      font-size: 21px; font-weight: 400; line-height: 1.7; color: var(--ink);
+    }
+    .opening-name { font-size: 34px; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    @media (prefers-reduced-motion: reduce) {
+      .opening-wrap { animation: none; }
+    }
+
+    /* ---- Article ----
+       Articles and utility pages render identically. The only difference is the
+       mark in the masthead: an article carries its container's mark, a utility
+       page carries the plain Neotone mark. Media runs to the content grid;
+       reading stays at a measure. */
+    .piece { max-width: var(--max); margin: 0 auto; padding: 0 48px 40px; }
+    .piece-head { max-width: 680px; margin: 0 auto; padding: 64px 0 44px; }
+    .piece-kicker {
+      display: block; margin-bottom: 16px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted);
+    }
+    .piece-title { margin: 0 0 20px; font-size: 40px; font-weight: 400; line-height: 1.15; letter-spacing: -0.01em; }
+    .piece-standfirst { margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); }
+    .piece-media { margin: 0 0 56px; }
+    .video-box { width: 100%; aspect-ratio: 16 / 9; background: #ededed; }
+    .piece-caption { margin: 12px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
+    .piece-body { max-width: 680px; margin: 0 auto; }
+    .piece-body p { margin: 0 0 1.45em; font-size: 17px; line-height: 1.75; }
+    .piece-body p:last-child { margin-bottom: 0; }
+    .piece-sub {
+      margin: 2.4em 0 1em; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted);
+    }
+    @media (max-width: 980px) {
+      .piece-title { font-size: 30px; }
+      .piece-head { padding-top: 48px; }
+    }
+
+    /* ---- Contents and section lists (utility pages) ---- */
+    .toc { max-width: 680px; margin: 0 auto; }
+    .toc-group { margin-bottom: 46px; }
+    .toc-group:last-child { margin-bottom: 0; }
+    .toc-label {
+      display: block; margin-bottom: 12px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted);
+    }
+    .toc-note { margin: 0 0 14px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+    .toc-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+    .toc-list li { border-bottom: 1px solid var(--line); }
+    .toc-list a { display: block; padding: 13px 0; font-size: 16px; }
+    .toc-list a:hover { color: var(--muted); }
+    .toc-out {
+      margin-left: 10px; font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted);
+    }
+
+    /* ---- Legal ----
+       Same vocabulary as the manual: a contents jump, hairline rows, and the
+       small uppercase label from .piece-sub. No new devices, because a utility
+       page that invented its own would read as a different site. */
+    .legal-jump { max-width: 680px; margin: 0 auto 64px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+    .legal-jump a { font-size: 13px; color: var(--muted); }
+    .legal-jump a:hover { color: var(--ink); }
+    .legal-jump span { font-size: 13px; color: var(--line); }
+
+    .legal-sec { max-width: 680px; margin: 0 auto 72px; scroll-margin-top: 140px; }
+    .legal-sec:last-of-type { margin-bottom: 0; }
+    .legal-sec h2 { margin: 0 0 18px; font-size: 26px; font-weight: 400; letter-spacing: -0.01em; }
+    .legal-sec > p { margin: 0 0 1.45em; font-size: 17px; line-height: 1.75; }
+    .legal-note { margin: 0 0 6px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+
+    /* Rows, matching .toc-list exactly. A review point is a line you can act on,
+       which is the same shape as a contents entry. */
+    .legal-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+    .legal-list li { border-bottom: 1px solid var(--line); padding: 13px 0; font-size: 16px; line-height: 1.6; }
+    .legal-list li b { font-weight: 400; }
+    .legal-list li span { color: var(--muted); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <div class="masthead" role="presentation"><img src="media/wordmark/neotone.svg" alt="Neotone"></div>
+      <div class="sections">
+        <a href="index.html" data-section="tonefield">Tonefield</a>
+        <a href="instrument.html" data-section="instruments">Instruments</a>
+      </div>
+    </div>
+  </nav>
+
+  <article class="piece">
+
+    <header class="piece-head">
+      <span class="piece-kicker">Soundventure Kft, Budapest</span>
+      <h1 class="piece-title">Legal</h1>
+      <p class="piece-standfirst">One page rather than two links. Privacy first because it applies to everyone reading, then the terms that apply once you order, then the terms that apply to the site itself.</p>
+    </header>
+
+    <nav class="legal-jump">
+      <a href="#privacy">Privacy</a>
+      <span>&middot;</span>
+      <a href="#sale">Terms of sale</a>
+      <span>&middot;</span>
+      <a href="#site">Terms of website use</a>
+    </nav>
+
+    <section class="legal-sec" id="privacy">
+      <h2>Privacy</h2>
+      <p>What is collected, why, for how long, and how to get it back or have it deleted. It applies to every reader, including one who never orders anything, which is why it comes first.</p>
+      <p class="legal-note">Reviewed against the current policy at digitalhandpan.com/privacy-policy.pdf. That document is a Japanese manufacturer's template with the names changed: it cites the Personal Information Protection Law and the Personal Information Protection Committee, which are Japan's statute and regulator, and refers to group companies, a distributor, repaired products being dispatched, and servers outside "our plant." A GDPR section is appended, so obligations are stated twice under two regimes, one of which does not apply.</p>
+
+      <span class="piece-sub">Cut</span>
+      <ul class="legal-list">
+        <li><b>The entire Japanese half.</b> <span>Sections resting on the Personal Information Protection Law are not the law you operate under. GDPR and the Hungarian implementation are.</span></li>
+        <li><b>Group companies, distributors, subsidiaries, the plant.</b> <span>There is one company and one workshop.</span></li>
+        <li><b>Behavioural advertising via Google.</b> <span>The policy discloses targeted advertising cookies. If that is not running, it declares processing that does not happen. If it is, a footer opt-out link is not consent.</span></li>
+        <li><b>"2022 DigitalOcean, LLC"</b> <span>as the named host. That is a copyright string pasted in as a party.</span></li>
+        <li><b>Survey, contest and event language.</b> <span>None of it exists.</span></li>
+      </ul>
+
+      <span class="piece-sub">Missing</span>
+      <ul class="legal-list">
+        <li><b>The real categories of data.</b> <span>The policy declares name and email. You take orders: postal address, telephone, payment handled by a processor, and a serial number tied to a person for the life of the instrument.</span></li>
+        <li><b>neOS accounts and the Scale Gallery.</b> <span>An account, a public display name, and user-created scales published to other players. None of it is mentioned, and it is the most personal thing the company holds.</span></li>
+        <li><b>Named processors.</b> <span>Payment provider, email sender, host, and anything the software talks to. A list, kept current.</span></li>
+        <li><b>Retention periods that are actual periods.</b> <span>"As long as necessary" is not one. An instrument warranty gives a real number to anchor to.</span></li>
+        <li><b>Controller identity in full.</b> <span>Registered company name, seat, company registration number, and a contact route that is not only an email address.</span></li>
+        <li><b>Cookies, honestly.</b> <span>Easiest version: run none beyond what the site needs to function, say so in a sentence, and never build a consent banner. A site whose principle is answering questions where they arise should not open with a modal asking permission to track.</span></li>
+      </ul>
+    </section>
+
+    <section class="legal-sec" id="sale">
+      <h2>Terms of sale</h2>
+      <p>The document that does not currently exist, and the one with real consequences. Someone is paying five figures for an object that will not exist for another sixty days.</p>
+      <p class="legal-note">The One page already states purchase terms inline, where the question arises. This section is what those statements have to be consistent with. If the two ever disagree, the customer relies on the one they read at the moment of ordering, which is the inline one.</p>
+
+      <span class="piece-sub">Cover</span>
+      <ul class="legal-list">
+        <li><b>Right of withdrawal.</b> <span>Fourteen days on a distance sale, when the clock starts, and how to exercise it. Whether a made-to-order instrument in a chosen wood is exempt as a personalised good is exactly the question to get answered rather than assumed.</span></li>
+        <li><b>The two year guarantee of conformity</b> <span>, separate from and additional to any warranty offered voluntarily. Say which is which, because buyers conflate them.</span></li>
+        <li><b>Lead time as a commitment.</b> <span>"~60 days" appears in the specs. What happens at day 90, and what the buyer can do about it.</span></li>
+        <li><b>Deposit, balance and cancellation.</b> <span>When money is taken, what is refundable once wood has been cut, and what is not.</span></li>
+        <li><b>B-stock.</b> <span>What the grade means, what is excluded, and whether the guarantee differs.</span></li>
+        <li><b>Delivery, risk and customs.</b> <span>When risk passes, who clears the instrument, and who pays duty outside the EU.</span></li>
+        <li><b>Repairs.</b> <span>An instrument that comes back to Budapest and returns: shipping, timescale, what is covered.</span></li>
+        <li><b>Referral discounts.</b> <span>Who is eligible, whether codes stack, and how long one is good for. The wireframe already enforces rules that no document states.</span></li>
+        <li><b>The software is part of the product.</b> <span>A buyer purchases an instrument whose behaviour changes with updates. Say what is guaranteed to keep working, and for how long.</span></li>
+      </ul>
+    </section>
+
+    <section class="legal-sec" id="site">
+      <h2>Terms of website use</h2>
+      <p>The shortest of the three, and the one currently doing the least. Reading this site creates almost no relationship: there is no account, nothing to post, and nothing to agree to.</p>
+      <p class="legal-note">Reviewed against digitalhandpan.com/terms-of-use.pdf. US-style boilerplate: all-caps disclaimers, attorneys' fees, and "the laws of the EU" in the governing law clause. The EU is not a jurisdiction that can be chosen. It also governs message boards and user registration, neither of which exists, and spells the company "Sounventure" once.</p>
+
+      <span class="piece-sub">Cut</span>
+      <ul class="legal-list">
+        <li><b>The Submissions clause,</b> <span>which is the one actively working against the company. It states that anything a user posts becomes Soundventure's property, free to exploit commercially. Read against the Scale Gallery, that claims ownership of scales players made. It should be a licence: the player keeps the scale, Neotone gets the right to host, display and distribute it, and can say so in one sentence.</span></li>
+        <li><b>Message boards and registration requirements.</b> <span>Neither exists on this site.</span></li>
+        <li><b>Blanket exclusion of all liability and all warranties.</b> <span>Largely unenforceable against consumers here, so it buys little and reads as hostile from a company whose whole argument is that it is serious.</span></li>
+        <li><b>The prohibition on saving or printing pages.</b> <span>Unenforceable, and strange on a site built to be read.</span></li>
+      </ul>
+
+      <span class="piece-sub">Fix or add</span>
+      <ul class="legal-list">
+        <li><b>Governing law and venue:</b> <span>Hungary, and a named court, with the note that consumers keep the protections of their own country.</span></li>
+        <li><b>Who publishes this site,</b> <span>in a line: registered name, seat, registration number, contact.</span></li>
+        <li><b>Editorial content is the company's,</b> <span>and quotation with attribution is welcome. Cheaper to say than to litigate, and it matches how the writing is meant to travel.</span></li>
+        <li><b>Scale Gallery rules,</b> <span>if they live anywhere: what may be shared, what happens when a scale is unshared, and the fact that a copy already added to someone's list stays with them. The software already behaves this way; nothing states it.</span></li>
+        <li><b>The company name spelled correctly.</b> <span></span></li>
+      </ul>
+    </section>
+
+  </article>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+
+      <div class="footer-top">
+        <div class="footer-sections">
+          <a href="index.html">Tonefield</a>
+          <a href="instrument.html">Instruments</a>
+        </div>
+        <form class="footer-search" onsubmit="handleSearch(event)">
+          <input type="search" placeholder="Search" />
+          <button type="submit" aria-label="Search">&rarr;</button>
+        </form>
+      </div>
+
+      <div class="footer-band">
+        <div class="footer-utility">
+          <a onclick="utilityLink(\'Workshop\')">Workshop</a>
+          <a href="manual.html">Manual</a>
+          <a href="updates.html">Updates</a>
+          <a onclick="utilityLink('Contact')">Contact</a>
+          <a href="legal.html">Legal</a>
+        </div>
+        <div class="footer-place">
+          <p class="footer-meta">Budapest &middot; visits by appointment</p>
+          <p class="footer-meta footer-social">
+            <a onclick="socialLink('Instagram')">Instagram</a> &middot;
+            <a onclick="socialLink('YouTube')">YouTube</a> &middot;
+            <a onclick="socialLink('TikTok')">TikTok</a> &middot;
+            <a onclick="socialLink('Facebook')">Facebook</a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    /* ---- Masthead ----
+       SECTION is which of the three this page belongs to, empty on pages that
+       belong to none. It marks the current section. With the sections on screen
+       the whole way down there is nothing to return from, which removes most of
+       the machinery v2 needed. */
+    const SECTION = '';
+
+    const nav      = document.querySelector('nav');
+    const navInner = document.querySelector('.nav-inner');
+    const masthead = document.querySelector('.masthead');
+    const sections = document.querySelector('.sections');
+    const links    = [...document.querySelectorAll('.sections a')];
+
+    /* The section this page belongs to is marked from the first frame. Pages
+       belonging to no section, legal for instance, mark nothing. */
+    const current = links.find(a => a.dataset.section === SECTION);
+    if (current) current.classList.add('current');
+
+    /* Two overlapping ranges. The sections you are not in fade first and
+       slowly; the pair travels left over a longer distance, so the move reads
+       as deliberate and stays tied to the scroll rather than snapping. */
+    const FADE_FROM  = 20,  FADE_TO  = 220;
+    const SHIFT_FROM = 60,  SHIFT_TO = 460;
+    const MARK_TOP   = [30, 22];
+    const SECT_TOP   = [86, 62];
+    const MARK_SCALE = [1, 0.55];
+
+    let markShift = null;
+    const selNav = document.getElementById('sel-nav');
+
+
+    /* Measured with the bar at rest, so the numbers are the distance from where
+       each element sits when centred to the content boundary. Remeasured once
+       the wordmark has loaded, since an image with no width measures wrong. */
+    function measure() {
+      const style = getComputedStyle(navInner);
+      const contentLeft = navInner.getBoundingClientRect().left + parseFloat(style.paddingLeft);
+      const rest = el => {
+        const prev = el.style.transform;
+        el.style.transform = 'translateX(-50%)';
+        const left = el.getBoundingClientRect().left;
+        el.style.transform = prev;
+        return left;
+      };
+      markShift = Math.round(contentLeft - rest(masthead));
+      /* offsetLeft on a link is measured inside .sections, which is its offset
+         parent, so it is added to the row's own left rather than compared with
+         it. Both targets are the same content boundary, which is what puts the
+         mark and the section you are in on one left edge. */
+
+    }
+
+    const ramp = (y, a, b) => Math.min(Math.max((y - a) / (b - a), 0), 1);
+    const lerp = (r, t) => r[0] + (r[1] - r[0]) * t;
+
+    /* The ramps are scaled to the page. On a short page, a placeholder or an
+       empty checkout, there is not enough scroll to travel the full distance,
+       and the bar would stop part way. Scaling the ranges to the available
+       scroll means the collapse always completes by the bottom, however far
+       the bottom is. */
+    function scrollRange() {
+      return Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+    }
+
+    function updateNav() {
+      if (markShift === null) measure();
+      const y = window.scrollY;
+      const k = Math.min(1, scrollRange() / SHIFT_TO) || 1;
+      const fade  = ramp(y, FADE_FROM * k, FADE_TO * k);
+      const shift = ramp(y, SHIFT_FROM * k, SHIFT_TO * k);
+
+      masthead.style.top = lerp(MARK_TOP, shift) + 'px';
+      masthead.style.transform =
+        'translateX(calc(-50% + ' + (markShift * shift) + 'px)) scale(' + lerp(MARK_SCALE, shift) + ')';
+
+      sections.style.top = lerp(SECT_TOP, shift) + 'px';
+
+      /* Selection sits at the right of the row, level with the section names,
+         and stays through the collapse: it is an affordance, not a section. */
+      if (selNav) selNav.style.top = lerp(SECT_TOP, shift) + 'px';
+
+      /* Every section fades, the current one included. Collapsed, the bar is
+         the name alone: present, and a way back to the menu. The page says
+         where you are; the bar does not have to. */
+      links.forEach(a => {
+        a.style.opacity = String(1 - fade);
+        a.style.pointerEvents = fade > 0.9 ? 'none' : '';
+      });
+
+
+    }
+
+    /* Once the bar has moved, the mark reopens it. At rest it goes to the
+       front, which is what it says. */
+    /* Collapsed, the bar is a label rather than a menu: the two sections you are
+       not in are invisible and take no clicks. Anywhere in the bar reopens it,
+       so reaching for a section name that is not there does something sensible
+       instead of nothing. The section you are in still behaves as a link. */
+    /* Collapsed, the bar is a label rather than a menu, and anywhere in it
+       reopens the bar. The section you are in behaves exactly as the mark does,
+       because at that point the two are halves of one label and clicking either
+       should do the same thing. */
+    nav.addEventListener('click', e => {
+      const own = e.target.closest('.sections a[data-section="' + SECTION + '"]');
+      if (own) {
+        e.preventDefault();
+        if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      if (window.scrollY <= SHIFT_FROM) return;
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    function remeasure() { markShift = null; updateNav(); }
+    window.addEventListener('resize', remeasure);
+    window.addEventListener('load', remeasure);
+    document.querySelectorAll('nav img').forEach(img => {
+      if (!img.complete) img.addEventListener('load', remeasure, { once: true });
+    });
+
+
+
+    window.addEventListener('scroll', updateNav, { passive: true });
+    updateNav();
+
+    /* ---- Footer ---- */
+    /* Footer section links rise before they leave. At the bottom of a page the
+       bar is collapsed to a label, so navigating straight away would cut to a
+       page with the menu already open. Scrolling up first lets it unfold on the
+       way out, and the next page then opens in the state you left this one in.
+
+       The interval watches for the scroll to land; the timeout fires the
+       navigation regardless, covering smooth scrolling being disabled or
+       interrupted, so the link can never become a dead end. */
+    function scrollToTopThen(after) {
+      if (window.scrollY < 4) { if (after) after(); return; }
+      let gone = false;
+      const go = () => { if (!gone) { gone = true; if (after) after(); } };
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const watch = setInterval(() => {
+        if (window.scrollY < 4) { clearInterval(watch); setTimeout(go, 160); }
+      }, 50);
+      setTimeout(() => { clearInterval(watch); go(); }, 1200);
+    }
+
+    document.querySelectorAll('.footer-sections a').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const href = link.getAttribute('href');
+        const here = location.pathname.split('/').pop() || 'index.html';
+        /* Already here: just go back to the top and let the bar reopen. */
+        if (href === here) { scrollToTopThen(null); return; }
+        scrollToTopThen(() => { window.location.href = href; });
+      });
+    });
+
+    function handleSearch(e) {
+      e.preventDefault();
+      alert("Site search. Not mocked up yet.");
+    }
+    /* Outbound, so they leave the site rather than routing through it. Wired as
+       alerts here because the accounts are not linked yet. */
+    function socialLink(name) {
+      alert("Neotone on " + name + ". External link, not wired up yet.");
+    }
+
+    function utilityLink(name) {
+      alert(name === 'Workshop'
+        ? "Workshop: the people and the production process. Not mocked up yet."
+        : name + " page. Not mocked up yet.");
+    }
+
+
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Neotone</title>
+  <style>
+    :root { --ink: #111; --line: #d9d9d9; --muted: #4f4f4f; --green: #2a7a2a; --max: 1180px; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    a { color: inherit; text-decoration: none; }
+
+    body { background: #fff; color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+
+    /* ---- Masthead ----
+       Neotone sits above the sections rather than beside them, which is the
+       whole point of v3: the company is the umbrella, and Culture, Instrument
+       and Craft are what it consists of.
+
+       Two states. At the top of a page the mark is centred with the sections
+       beneath it. Once you scroll, the bar collapses to a single row: small
+       mark on the left, sections on the right. The sections stay reachable the
+       whole way down, which the v2 nav could not do, since scrolling there
+       left only the return. */
+    /* ---- Masthead ----
+       Fixed height, contents positioned absolutely, and every moving value
+       driven by scroll position rather than by a timed transition. The bar is
+       therefore never mid-animation: where it sits is a function of how far
+       down the page you are. */
+    nav {
+      position: sticky; top: 0; z-index: 10;
+      background: #fff;
+      height: 118px;
+      /* Clipped left, right and top, open at the bottom. The row travels left as
+         you scroll and the items behind the current one go to negative x, which
+         would otherwise widen the page. overflow: hidden did that job but also
+         cut off the Instruments submenu, which hangs below the bar, and CSS
+         cannot clip one axis while leaving the other visible. */
+      clip-path: inset(0 0 -320px 0);
+    }
+    .nav-inner {
+      position: relative;
+      max-width: var(--max); margin: 0 auto; padding: 0 48px;
+      height: 100%;
+    }
+
+    .masthead {
+      position: absolute; left: 50%; top: 30px;
+      transform: translateX(-50%);
+      transform-origin: left center;
+      cursor: pointer;
+      will-change: transform, top;
+    }
+    .masthead img { height: 40px; width: auto; display: block; }
+
+    /* The row keeps its width the whole way down. Rather than folding items out
+       of the flow, which changes the width and makes the target move, the row
+       slides until the section you are in reaches the boundary. The others
+       travel with it and fade out. */
+    .sections {
+      position: absolute; left: 50%; top: 86px;
+      transform: translateX(-50%);
+      display: flex; align-items: baseline;
+      will-change: transform, top;
+    }
+    .sections a {
+      font-size: 14px; letter-spacing: 0.02em; color: var(--muted);
+      cursor: pointer; margin-left: 30px; white-space: nowrap;
+      /* No colour transition. Everything in this bar is a function of scroll
+         position, and a 200ms ease made the emphasis lag the scroll. */
+    }
+    .sections a:first-child { margin-left: 0; }
+
+
+    .sections a:hover { color: var(--ink); }
+    /* Emphasis on where you are: ink rather than grey, with a hairline under
+       it. Quiet enough to sit in a centred row of three, clear enough to read
+       as a position rather than as a hover state. */
+    .sections a {
+      padding-bottom: 4px;
+      border-bottom: 1px solid transparent;
+    }
+    .sections a.current {
+      color: var(--ink);
+      border-bottom-color: var(--ink);
+    }
+
+    @media (max-width: 980px) {
+      .nav-inner { padding: 0 24px; }
+      .sections a { margin-left: 20px; }
+    }
+
+    /* Blocks size to their content rather than the viewport. The 115vh height
+       came from the original mockup, where each article filled a screen during
+       the colour-change scroll; without that mechanic it only pushed the first
+       article off the bottom edge, so it read as something still to arrive. */
+    .article {
+      width: 100%;
+      padding: 56px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    /* Gap between articles only, never before the first, so article one keeps
+       its position just below the middle of the viewport on load. Measured in
+       vh so the next article is always off the bottom edge and has to be
+       scrolled to, whatever the screen height. */
+    .article + .article { margin-top: 48vh; }
+    /* Adjacent sibling, not :first-of-type: the opening wrapper is also a div,
+       so it would claim first-of-type and this would silently match nothing. */
+    .opening-wrap + .article { padding-top: 116px; }
+    /* Room before the footer, so the last article ends rather than runs into it.
+       last-of-type is safe here: the footer is a <footer>, so the final div
+       sibling is the last article. */
+    .article:last-of-type { padding-bottom: 32vh; }
+
+    .article-label {
+      font-family: sans-serif;
+      font-size: 96px;
+      font-weight: 700;
+      color: rgba(0,0,0,0.15);
+    }
+
+    .article-title {
+      font-family: sans-serif;
+      font-size: 20px;
+      font-weight: 400;
+      color: rgba(0,0,0,0.4);
+      letter-spacing: 0.01em;
+    }
+
+    /* ---- Footer ----
+       Two quiet bands: sections + search, then utility + place. No column
+       headings, no dividers beyond a single hairline. Wraps rather than
+       needing breakpoints. */
+    .site-footer { background: #000; color: #fff; margin-top: 96px; }
+    .footer-inner { max-width: var(--max); margin: 0 auto; padding: 56px 48px; }
+
+    /* Top band restates the structure and holds search. The sections repeat the
+       bar deliberately: at the bottom of a page a reader is deciding what is
+       next, and a list of where they can go is useful even though the same list
+       is above. They also give search a left side, so it can sit right at its
+       own size rather than spanning the measure. */
+    .footer-top {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 32px; flex-wrap: wrap;
+    }
+    .footer-sections { display: flex; align-items: baseline; gap: 22px; flex-wrap: wrap; }
+    .footer-sections a {
+      font-size: 13px; color: #fff; text-decoration: none; cursor: pointer;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .footer-sections a:hover { opacity: 0.55; }
+
+    .footer-search { display: flex; align-items: center; width: 260px; max-width: 100%; }
+    .footer-search input {
+      flex: 1; min-width: 0; background: none; color: #fff;
+      border: none; border-bottom: 1px solid rgba(255,255,255,0.28);
+      padding: 6px 0; font-size: 13px; font-family: inherit;
+    }
+    .footer-search input::placeholder { color: rgba(255,255,255,0.35); }
+    .footer-search input:focus { outline: none; border-bottom-color: rgba(255,255,255,0.7); }
+    .footer-search button {
+      background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.28);
+      color: rgba(255,255,255,0.55); padding: 6px 0 6px 14px;
+      font-size: 14px; font-family: inherit; cursor: pointer;
+    }
+    .footer-search button:hover { color: #fff; }
+
+    .footer-band {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 20px 32px; flex-wrap: wrap;
+      margin-top: 44px; padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .footer-utility { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+    .footer-utility a { font-size: 12px; color: rgba(255,255,255,0.55); text-decoration: none; cursor: pointer; font-family: Arial, Helvetica, sans-serif; }
+    .footer-utility a:hover { color: #fff; }
+
+    .footer-place { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    @media (min-width: 981px) { .footer-place { align-items: flex-end; text-align: right; } }
+    .footer-meta { margin: 0; font-size: 12px; color: rgba(255,255,255,0.38); font-family: Arial, Helvetica, sans-serif; }
+    .footer-social a { color: rgba(255,255,255,0.55); cursor: pointer; }
+    .footer-social a:hover { color: #fff; }
+
+    /* ---- Page opening ----
+       Every page opens with one centred statement of what it is for, with the
+       section's own name inside that sentence rather than above it as a
+       heading. The nav already names the page, so a headline only repeats it.
+       Same gesture on every page, so the whole site reads as written. */
+    /* Entry fade sits on the wrapper, not the heading. The animation uses
+       fill: both, so its final opacity keeps applying and would override the
+       scroll fade below. Two elements, two opacities, composed by the browser. */
+    .opening-wrap { animation: opening-in 760ms ease 140ms both; }
+    @keyframes opening-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .opening {
+      max-width: 720px; margin-left: auto; margin-right: auto;
+      padding: 64px 0 52px; text-align: center;
+      font-size: 21px; font-weight: 400; line-height: 1.7; color: var(--ink);
+    }
+    .opening-name { font-size: 34px; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    .opening-sub { display: block; margin-top: 14px; font-size: 15px; line-height: 1.4; color: var(--muted); letter-spacing: 0.02em; }
+    @media (prefers-reduced-motion: reduce) {
+      .opening-wrap { animation: none; }
+    }
+
+    /* ---- Container feed ----
+       Previews, not cards. You read a little in place and may watch something
+       before deciding to open the piece. Because a preview can carry media, the
+       block itself is not a link: clicking a video has to play it. The title is
+       the target, with a quiet continue link at the end. This amends principle
+       14, which assumes a block with nothing interactive inside it. */
+    /* No opening line here: the masthead names Neotone and the pieces say what it is,
+   so the feed itself opens the page and carries the entry fade. */
+    .feed { max-width: var(--max); margin: 0 auto; padding: 0 48px 0;
+            animation: opening-in 760ms ease 140ms both; }
+    @media (prefers-reduced-motion: reduce) { .feed { animation: none; } }
+    .feed-item { max-width: 680px; margin: 0 auto; scroll-margin-top: 140px; }
+    .feed-item + .feed-item { margin-top: 96px; }
+    /* Every piece is built the same way: image, kicker, title, excerpt, link,
+       at the same size, with the same gap. The lead and second carry classes
+       for the editorial rule that the first two show one register each, and
+       nothing else distinguishes them. Earlier versions gave the lead a wider
+       image and put the second's image below its text to force both titles
+       into a 900px viewport; together they made the feed read as three
+       different layouts. Uniform wins. On a 900px screen the second piece's
+       kicker sits at the edge; its title is inside the first screen on
+       anything taller. */
+    .feed-media { width: 100%; aspect-ratio: 16 / 9; background: #ededed; margin-bottom: 24px; }
+    .feed-kicker {
+      display: block; margin-bottom: 12px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted);
+    }
+    .feed-title { margin: 0 0 16px; font-size: 28px; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; }
+    .feed-title a:hover { color: var(--muted); }
+    .feed-excerpt { margin: 0 0 18px; font-size: 16px; line-height: 1.7; }
+    .feed-more { font-size: 14px; font-style: italic; color: var(--muted); }
+    .feed-more:hover { color: var(--ink); text-decoration: underline; }
+    @media (max-width: 980px) { .feed { padding: 0 24px 0; } .feed-title { font-size: 24px; } }
+
+    /* ---- End of feed ----
+       Load more, then subscribe. Load more continues the reading; subscribing
+       is what you do once you have decided to stop, so putting the field first
+       would interrupt a reader who is still going. When the feed eventually
+       runs out the button goes and subscribe becomes the terminus, with nothing
+       rearranged.
+
+       The bar is the only solid black in the white part of the page, so it
+       reads as the end of the run and rhymes with the footer arriving under it.
+       Sits well below the last piece and close to the footer, so scrolling to
+       it feels like reaching the end rather than finding another section. */
+    .feed-end { max-width: var(--max); margin: 96px auto 0; padding: 0 48px; }
+    @media (max-width: 980px) { .feed-end { margin-top: 80px; padding: 0 24px; } }
+    .feed-end-inner { max-width: 680px; margin: 0 auto; }
+
+    .load-more {
+      display: block; width: 100%; background: #000; color: #fff;
+      border: none; padding: 18px 0; cursor: pointer;
+      font-family: inherit; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
+    }
+    .load-more:hover { background: #222; }
+
+    /* ---- Subscribe ----
+       Not Tonefield: that is a publication, and this is a notice board. Not
+       "stay in touch" either, which promises a relationship from a company that
+       will write four times a year. Updates says plainly what it is, the same
+       move as "Budapest · visits by appointment". */
+    .subscribe { margin-top: 56px; }
+    .subscribe-label {
+      display: block; margin-bottom: 12px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted);
+    }
+    .subscribe p { margin: 0 0 22px; font-size: 17px; line-height: 1.75; }
+    .subscribe-archive { color: var(--muted); border-bottom: 1px solid var(--line); }
+    .subscribe-archive:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .subscribe-form { display: flex; align-items: center; max-width: 420px; }
+    .subscribe-form input {
+      flex: 1; min-width: 0; background: none; color: var(--ink);
+      border: none; border-bottom: 1px solid var(--line);
+      padding: 8px 0; font-size: 15px; font-family: inherit;
+    }
+    .subscribe-form input::placeholder { color: var(--muted); }
+    .subscribe-form input:focus { outline: none; border-bottom-color: var(--ink); }
+    .subscribe-form button {
+      background: none; border: none; border-bottom: 1px solid var(--line);
+      color: var(--muted); padding: 8px 0 8px 16px;
+      font-size: 15px; font-family: inherit; cursor: pointer;
+    }
+    .subscribe-form button:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <div class="masthead" role="presentation"><img src="media/wordmark/neotone.svg" alt="Neotone"></div>
+      <div class="sections">
+        <a href="index.html" data-section="tonefield">Tonefield</a>
+        <a href="instrument.html" data-section="instruments">Instruments</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Tonefield. One feed, two registers, the kicker tells you which. The
+       running order is editorial: the first screen shows a craft piece and a
+       culture piece together, so a reader of either kind sees their own.
+       Every entry below is a piece genuinely in progress, sourced from the
+       1000th-instrument draft, the artist interviews, and the manual's third
+       register. Titles are working titles. -->
+  <!-- Opening. Same shape as the instrument page's: the name large, the
+       sentence plain. Tonefield is a coined word and this is where it gets its
+       meaning. Craft and culture are the two registers, named once here and
+       then carried by the kickers. -->
+  <div class="opening-wrap">
+    <h1 class="opening"><span class="opening-name">Tonefield</span><span class="opening-sub">A quarterly of craft and culture</span></h1>
+  </div>
+
+  <div class="feed">
+
+      <article class="feed-item lead" id="only-beginning">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Culture</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">Only beginning to understand what they had built</a></h2>
+        <p class="feed-excerpt">It started with a handpan that seemed too expensive and two programmers who decided to build one instead. Seven years, a thousand instruments and 418 million strikes later, the thing they made is still teaching them about the instrument it began as an answer to.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
+
+      <article class="feed-item second" id="strike-not-trigger">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Craft</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">A strike is not a trigger</a></h2>
+        <p class="feed-excerpt">Two programmers watched a video of a player hitting almost the same spot on a handpan for minutes and getting a different tone every time. Everything digital instruments were good at was the opposite of that. The answer began with a kitchen scale taken apart.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
+
+      <article class="feed-item" id="golsa-nazari">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Culture</span>
+        <h2 class="feed-title"><a href="neotone-golsa-nazari.html">&ldquo;I don&rsquo;t lose inspiration while searching for another instrument&rdquo;</a></h2>
+        <p class="feed-excerpt">Golsa Nazari is a handpan player, composer and teacher from Iran, working between acoustic instruments and a digital one. What changed for her was less the sound than the interruption: moving between scales used to mean moving between instruments, and an idea rarely survived the trip.</p>
+        <a class="feed-more" href="neotone-golsa-nazari.html">Continue reading &rarr;</a>
+      </article>
+
+      <article class="feed-item" id="how-much-freedom">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Craft</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">Not how many scales, but how much freedom</a></h2>
+        <p class="feed-excerpt">An acoustic handpan is one scale, chosen once, by its maker. A digital one hands that choice to the player, and a choice you make constantly needs knowledge to make it with.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
+
+      <article class="feed-item" id="note-names">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Craft</span>
+        <h2 class="feed-title"><a href="neos-note-names.html">Why the note names change as you build</a></h2>
+        <p class="feed-excerpt">Build a D Kurd and something quiet happens. You place the note your ear calls an A sharp, and the instrument writes down a B flat. The logic behind that is older than the instrument, and it is the same logic a scale uses to decide what it is.</p>
+        <a class="feed-more" href="neos-note-names.html">Continue reading &rarr;</a>
+      </article>
+
+      <article class="feed-item" id="every-source-clean">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Studio</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">&ldquo;Every source needs to remain clean&rdquo;</a></h2>
+        <p class="feed-excerpt">Didgeridoo, beatbox, jaw harp and a digital handpan, into a mixer, into a looper, every channel opened and closed from a MIDI controller. Zalem&rsquo;s live-looping set walked end to end, down to the didgeridoo bass sequenced offbeat against the kick and pitched from the Neotone through a vocoder.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
+
+      <article class="feed-item" id="orchestral-ideas">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Culture</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">&ldquo;Orchestral ideas, still thinking like a handpan player&rdquo;</a></h2>
+        <p class="feed-excerpt">Golsa Nazari sketches for orchestra on an instrument played with the hands. The habits of a player&rsquo;s technique carried into composition, and which scales she reaches for when the sound is no longer a handpan.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
+
+      <article class="feed-item" id="loud-room">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Craft</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">&ldquo;Where using a microphone is nearly impossible&rdquo;</a></h2>
+        <p class="feed-excerpt">An acoustic handpan is one of the hardest instruments to put through a PA. A condenser hears the whole stage; a pickup hears the wrong thing. A live-looping didgeridoo player and a bass-music producer hit the same wall from opposite directions.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
+
+      <article class="feed-item" id="two-players">
+        <div class="feed-media"></div>
+        <span class="feed-kicker">Studio</span>
+        <h2 class="feed-title"><a href="#" onclick="pieceLink(event)">&ldquo;While someone else plays the instrument&rdquo;</a></h2>
+        <p class="feed-excerpt">Cam Steen runs the instrument through a chain of effects, live, while another player plays it. One instrument, two musicians, and a piece of music neither of them is fully in charge of.</p>
+        <a class="feed-more" href="#" onclick="pieceLink(event)">Continue reading &rarr;</a>
+      </article>
+
+  </div>
+
+  <div class="feed-end">
+    <div class="feed-end-inner">
+
+      <button class="load-more" onclick="loadMore()">Load more</button>
+
+      <div class="subscribe">
+        <span class="subscribe-label">Mailing list</span>
+        <p>Updates from the Neotone workshop</p>
+        <form class="subscribe-form" onsubmit="handleSubscribe(event)">
+          <input type="email" placeholder="Email" required />
+          <button type="submit" aria-label="Subscribe">&rarr;</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+
+      <div class="footer-top">
+        <div class="footer-sections">
+          <a href="index.html">Tonefield</a>
+          <a href="instrument.html">Instruments</a>
+        </div>
+        <form class="footer-search" onsubmit="handleSearch(event)">
+          <input type="search" placeholder="Search" />
+          <button type="submit" aria-label="Search">&rarr;</button>
+        </form>
+      </div>
+
+      <div class="footer-band">
+        <div class="footer-utility">
+          <a onclick="utilityLink(\'Workshop\')">Workshop</a>
+          <a href="manual.html">Manual</a>
+          <a href="updates.html">Updates</a>
+          <a onclick="utilityLink('Contact')">Contact</a>
+          <a href="legal.html">Legal</a>
+        </div>
+        <div class="footer-place">
+          <p class="footer-meta">Budapest &middot; visits by appointment</p>
+          <p class="footer-meta footer-social">
+            <a onclick="socialLink('Instagram')">Instagram</a> &middot;
+            <a onclick="socialLink('YouTube')">YouTube</a> &middot;
+            <a onclick="socialLink('TikTok')">TikTok</a> &middot;
+            <a onclick="socialLink('Facebook')">Facebook</a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    /* ---- Masthead ----
+       SECTION is which of the three this page belongs to, empty on pages that
+       belong to none. It marks the current section. With the sections on screen
+       the whole way down there is nothing to return from, which removes most of
+       the machinery v2 needed. */
+    const SECTION = 'tonefield';
+
+    const nav      = document.querySelector('nav');
+    const navInner = document.querySelector('.nav-inner');
+    const masthead = document.querySelector('.masthead');
+    const sections = document.querySelector('.sections');
+    const links    = [...document.querySelectorAll('.sections a')];
+
+    /* The section this page belongs to is marked from the first frame. Pages
+       belonging to no section, legal for instance, mark nothing. */
+    const current = links.find(a => a.dataset.section === SECTION);
+    if (current) current.classList.add('current');
+
+    /* Two overlapping ranges. The sections you are not in fade first and
+       slowly; the pair travels left over a longer distance, so the move reads
+       as deliberate and stays tied to the scroll rather than snapping. */
+    const FADE_FROM  = 20,  FADE_TO  = 220;
+    const SHIFT_FROM = 60,  SHIFT_TO = 460;
+    const MARK_TOP   = [30, 22];
+    const SECT_TOP   = [86, 62];
+    const MARK_SCALE = [1, 0.55];
+
+    let markShift = null;
+    const selNav = document.getElementById('sel-nav');
+
+
+    /* Measured with the bar at rest, so the numbers are the distance from where
+       each element sits when centred to the content boundary. Remeasured once
+       the wordmark has loaded, since an image with no width measures wrong. */
+    function measure() {
+      const style = getComputedStyle(navInner);
+      const contentLeft = navInner.getBoundingClientRect().left + parseFloat(style.paddingLeft);
+      const rest = el => {
+        const prev = el.style.transform;
+        el.style.transform = 'translateX(-50%)';
+        const left = el.getBoundingClientRect().left;
+        el.style.transform = prev;
+        return left;
+      };
+      markShift = Math.round(contentLeft - rest(masthead));
+      /* offsetLeft on a link is measured inside .sections, which is its offset
+         parent, so it is added to the row's own left rather than compared with
+         it. Both targets are the same content boundary, which is what puts the
+         mark and the section you are in on one left edge. */
+
+    }
+
+    const ramp = (y, a, b) => Math.min(Math.max((y - a) / (b - a), 0), 1);
+    const lerp = (r, t) => r[0] + (r[1] - r[0]) * t;
+
+    /* The ramps are scaled to the page. On a short page, a placeholder or an
+       empty checkout, there is not enough scroll to travel the full distance,
+       and the bar would stop part way. Scaling the ranges to the available
+       scroll means the collapse always completes by the bottom, however far
+       the bottom is. */
+    function scrollRange() {
+      return Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+    }
+
+    function updateNav() {
+      if (markShift === null) measure();
+      const y = window.scrollY;
+      const k = Math.min(1, scrollRange() / SHIFT_TO) || 1;
+      const fade  = ramp(y, FADE_FROM * k, FADE_TO * k);
+      const shift = ramp(y, SHIFT_FROM * k, SHIFT_TO * k);
+
+      masthead.style.top = lerp(MARK_TOP, shift) + 'px';
+      masthead.style.transform =
+        'translateX(calc(-50% + ' + (markShift * shift) + 'px)) scale(' + lerp(MARK_SCALE, shift) + ')';
+
+      sections.style.top = lerp(SECT_TOP, shift) + 'px';
+
+      /* Selection sits at the right of the row, level with the section names,
+         and stays through the collapse: it is an affordance, not a section. */
+      if (selNav) selNav.style.top = lerp(SECT_TOP, shift) + 'px';
+
+      /* Every section fades, the current one included. Collapsed, the bar is
+         the name alone: present, and a way back to the menu. The page says
+         where you are; the bar does not have to. */
+      links.forEach(a => {
+        a.style.opacity = String(1 - fade);
+        a.style.pointerEvents = fade > 0.9 ? 'none' : '';
+      });
+
+
+    }
+
+    /* Once the bar has moved, the mark reopens it. At rest it goes to the
+       front, which is what it says. */
+    /* Collapsed, the bar is a label rather than a menu: the two sections you are
+       not in are invisible and take no clicks. Anywhere in the bar reopens it,
+       so reaching for a section name that is not there does something sensible
+       instead of nothing. The section you are in still behaves as a link. */
+    /* Collapsed, the bar is a label rather than a menu, and anywhere in it
+       reopens the bar. The section you are in behaves exactly as the mark does,
+       because at that point the two are halves of one label and clicking either
+       should do the same thing. */
+    nav.addEventListener('click', e => {
+      const own = e.target.closest('.sections a[data-section="' + SECTION + '"]');
+      if (own) {
+        e.preventDefault();
+        if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      if (window.scrollY <= SHIFT_FROM) return;
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    function remeasure() { markShift = null; updateNav(); }
+    window.addEventListener('resize', remeasure);
+    window.addEventListener('load', remeasure);
+    document.querySelectorAll('nav img').forEach(img => {
+      if (!img.complete) img.addEventListener('load', remeasure, { once: true });
+    });
+
+
+
+    window.addEventListener('scroll', updateNav, { passive: true });
+    updateNav();
+
+    /* ---- Footer ---- */
+
+    /* A notice board, not a newsletter, and not the Tonefield subscription:
+       that is a publication and would be its own list. Nothing on One, where an
+       email field beside a five-figure order reads as a lead form. */
+    function handleSubscribe(e) {
+      e.preventDefault();
+      const value = e.target.querySelector('input').value;
+      alert("Mailing list sign-up. Not wired up yet.");
+      e.target.reset();
+    }
+
+    function loadMore() {
+      alert("Loads the next pieces. Not mocked up yet.");
+    }
+
+    /* Footer section links rise before they leave. At the bottom of a page the
+       bar is collapsed to a label, so navigating straight away would cut to a
+       page with the menu already open. Scrolling up first lets it unfold on the
+       way out, and the next page then opens in the state you left this one in.
+
+       The interval watches for the scroll to land; the timeout fires the
+       navigation regardless, covering smooth scrolling being disabled or
+       interrupted, so the link can never become a dead end. */
+    function scrollToTopThen(after) {
+      if (window.scrollY < 4) { if (after) after(); return; }
+      let gone = false;
+      const go = () => { if (!gone) { gone = true; if (after) after(); } };
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const watch = setInterval(() => {
+        if (window.scrollY < 4) { clearInterval(watch); setTimeout(go, 160); }
+      }, 50);
+      setTimeout(() => { clearInterval(watch); go(); }, 1200);
+    }
+
+    document.querySelectorAll('.footer-sections a').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const href = link.getAttribute('href');
+        const here = location.pathname.split('/').pop() || 'index.html';
+        /* Already here: just go back to the top and let the bar reopen. */
+        if (href === here) { scrollToTopThen(null); return; }
+        scrollToTopThen(() => { window.location.href = href; });
+      });
+    });
+
+    function pieceLink(e) {
+      e.preventDefault();
+      alert("Piece not drafted yet.");
+    }
+
+    function handleSearch(e) {
+      e.preventDefault();
+      alert("Site search. Not mocked up yet.");
+    }
+    /* Outbound, so they leave the site rather than routing through it. Wired as
+       alerts here because the accounts are not linked yet. */
+    function socialLink(name) {
+      alert("Neotone on " + name + ". External link, not wired up yet.");
+    }
+
+    function utilityLink(name) {
+      alert(name === 'Workshop'
+        ? "Workshop: the people and the production process. Not mocked up yet."
+        : name + " page. Not mocked up yet.");
+    }
+
+
+
+    /* ---- Scroll restoration ----
+       Opening a piece stores the container's position. The article's masthead
+       return sets a flag naming this page, and only that flag triggers a
+       restore, so arriving fresh from the nav still lands at the top. */
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    const SCROLL_KEY = 'neotone_scroll_' + SECTION;
+    const RESTORE_KEY = 'neotone_restore';
+
+    document.querySelectorAll('.feed-item a[href]').forEach(a => {
+      const href = a.getAttribute('href');
+      if (!href || href === '#') return;
+      a.addEventListener('click', () => {
+        sessionStorage.setItem(SCROLL_KEY, String(Math.round(window.scrollY)));
+      });
+    });
+
+    if (sessionStorage.getItem(RESTORE_KEY) === SECTION) {
+      const y = parseFloat(sessionStorage.getItem(SCROLL_KEY) || '0');
+      if (y > 0) {
+        // immediately, because this script runs after layout; the frame after is
+        // only a re-apply in case late content shifts the page under us
+        window.scrollTo(0, y);
+        requestAnimationFrame(() => { window.scrollTo(0, y); updateNav(); });
+      }
+      sessionStorage.removeItem(RESTORE_KEY);
+    }
+
+  </script>
+
+</body>
+</html>
