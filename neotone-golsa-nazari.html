@@ -3,27 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#FFFFFF">
 <title>I don’t lose inspiration while searching for another instrument · Tonefield</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="neo.css">
 <style>
 /* ---- page: one piece -------------------------------------- */
 .piece-head{padding:24px var(--pad) 22px;margin-top:var(--bar);}
-.piece-head h1{font-size:27px;line-height:1.15;letter-spacing:-.025em;font-weight:500;margin-top:10px;}
-.piece-head .stand{font-size:17px;line-height:1.5;color:var(--ink-2);margin-top:14px;}
+.piece-head h1{font-size:var(--t-title);line-height:var(--lh-title);letter-spacing:-.025em;font-weight:700;margin-top:10px;}
+.piece-head .stand{font-family:var(--f-ui);font-size:var(--t-lead);line-height:var(--lh-lead);font-weight:400;color:var(--muted);margin-top:14px;}
 .artmeta{
-  margin-top:18px;padding-top:13px;border-top:1px solid var(--line-soft);
-  font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  margin-top:var(--s5);padding-top:var(--s3);border-top:1px solid var(--line);
+  font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:var(--tr-label);
+  text-transform:uppercase;color:var(--muted);
 }
 
 .piece-body{padding:26px var(--pad) 8px;}
-.piece-body p{font-size:17px;line-height:1.6;color:var(--ink);}
-.piece-body p + p{margin-top:18px;}
+.piece-body p{font-size:var(--t-body);line-height:var(--lh-body);}
+.piece-body p + p{margin-top:var(--s5);}
 .piece-body .pull{margin:26px 0;}
 
 .sub-break{display:flex;align-items:center;gap:12px;margin:32px 0 20px;}
 .sub-break span{
-  font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);white-space:nowrap;
+  font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:var(--tr-label);
+  text-transform:uppercase;color:var(--wood);white-space:nowrap;
 }
 .sub-break i{flex:1;height:1px;background:var(--line);}
 
@@ -52,7 +57,7 @@
     </header>
 
     <figure>
-      <div class="lead-media" style="aspect-ratio:4/5;"><span class="ph">Lead image · 4:5</span></div>
+      <div class="lead-media chamfer" style="aspect-ratio:4/5;margin:0 var(--pad);width:auto;"><span class="ph">Lead image · 4:5</span></div>
       <figcaption class="media-cap">Golsa Nazari in her studio. Photograph, or a short performance film.</figcaption>
     </figure>
 

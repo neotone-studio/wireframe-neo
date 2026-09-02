@@ -64,7 +64,7 @@ shared.innerHTML =
       '<div class="sumline total" style="border-top:0;margin:0;padding:0 0 6px;" id="sel-total-row" hidden>' +
         '<span class="k">Total, incl. VAT</span><span class="v" id="sel-total">—</span>' +
       '</div>' +
-      '<button class="btn" id="sel-cta" disabled>Proceed to payment</button>' +
+      '<button class="btn action" id="sel-cta" disabled>Proceed to payment</button>' +
       '<button class="btn quiet" id="sel-save" hidden>Or save this selection by email →</button>' +
     '</div>' +
   '</div>' +
@@ -78,7 +78,7 @@ shared.innerHTML =
         '<input class="field" placeholder="Your name" required>' +
         '<input class="field" type="email" placeholder="Email" required>' +
         '<textarea class="field" rows="3" placeholder="Your question" style="resize:vertical;" required></textarea>' +
-        '<button class="btn" type="submit" style="margin-top:18px;">Send</button>' +
+        '<button class="btn action" type="submit" style="margin-top:18px;">Send</button>' +
       '</form>' +
     '</div>' +
   '</div>' +

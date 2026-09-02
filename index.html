@@ -3,8 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#FFFFFF">
 <title>One · Neotone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="neo.css">
 <style>
 /* ---- page: the instrument --------------------------------- */
@@ -12,7 +15,7 @@
 .app{padding-bottom:calc(var(--buy) + var(--safe-b) + 8px);}
 
 .hero{padding:0;border-top:0;}
-.hero-media{width:100%;aspect-ratio:1/1;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.hero-media{width:100%;aspect-ratio:1/1;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;}
 .hero-media img{width:100%;height:100%;object-fit:contain;padding:4% 4% 0;}
 .hero-body{padding:24px var(--pad) 30px;}
 .hero-body .meta{margin-top:16px;padding-top:14px;border-top:1px solid var(--line-soft);}
@@ -41,7 +44,7 @@
 .buybar{
   position:fixed;bottom:0;left:50%;z-index:55;
   width:100%;max-width:var(--app);
-  background:rgba(255,255,255,.94);backdrop-filter:saturate(180%) blur(12px);
+  background:var(--veil);backdrop-filter:saturate(180%) blur(12px);
   border-top:1px solid var(--line);
   padding:10px var(--pad) calc(10px + var(--safe-b));
   display:flex;align-items:center;gap:14px;
@@ -49,8 +52,8 @@
 }
 .buybar.show{transform:translate(-50%,0);}
 .buybar .grow{flex:1;min-width:0;}
-.buybar .t{font-size:14.5px;font-weight:500;line-height:1.2;display:block;}
-.buybar .d{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-top:3px;display:block;}
+.buybar .t{font-size:var(--t-ui);font-weight:600;line-height:1.2;display:block;}
+.buybar .d{font-family:var(--f-mono);font-size:9.5px;letter-spacing:var(--tr-label);text-transform:uppercase;color:var(--muted);margin-top:4px;display:block;}
 .buybar .btn{width:auto;padding:13px 26px;min-height:46px;}
 
 /* the configurator */
@@ -64,7 +67,7 @@
 .countrysel{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
   padding:12px 0;border-bottom:1px solid var(--line-soft);position:relative;}
 .countrysel select{position:absolute;inset:0;opacity:0;width:100%;height:100%;}
-.empty{border:1px solid var(--line);border-radius:3px;padding:24px 20px;text-align:center;}
+.empty{border:1px solid var(--line);border-radius:var(--r);padding:24px 20px;text-align:center;}
 .empty h3{margin-bottom:6px;}
 
 /* artists */
@@ -72,14 +75,14 @@
   padding:12px var(--pad);border-bottom:1px solid var(--line-soft);flex:0 0 auto;}
 .filters::-webkit-scrollbar{display:none;}
 .artist{display:flex;gap:13px;padding:15px 0;width:100%;text-align:left;align-items:flex-start;}
-.artist .av{flex:0 0 52px;width:52px;height:52px;background:var(--sunk);border-radius:2px;}
+.artist .av{flex:0 0 52px;width:52px;height:52px;background:var(--surface-soft);border-radius:var(--r-sm);}
 .artist .grow{flex:1;min-width:0;}
-.artist .who{font-size:15px;font-weight:600;display:block;}
+.artist .who{font-size:var(--t-ui);font-weight:600;display:block;letter-spacing:-.01em;}
 .artist .what{font-size:13px;color:var(--muted);line-height:1.45;margin-top:3px;display:block;}
-.artist .st{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);margin-top:7px;display:block;}
+.artist .st{font-family:var(--f-mono);font-size:9.5px;letter-spacing:var(--tr-label);text-transform:uppercase;color:var(--ink);margin-top:8px;display:block;}
 .artist .st.no{color:var(--muted);}
 .links{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 16px;}
-.links a{border:1px solid var(--line);border-radius:20px;padding:7px 14px;font-size:13px;color:var(--ink-2);}
+.links a{border:1px solid var(--line);border-radius:var(--r-pill);padding:8px 14px;font-size:var(--t-small);font-weight:500;color:var(--ink);}
 </style>
 </head>
 <body>
@@ -260,7 +263,7 @@
 
 <div class="buybar" id="buybar">
   <span class="grow"><span class="t">Neotone One</span><span class="d">From €3,240</span></span>
-  <button class="btn" onclick="startOrder('build')">Order</button>
+  <button class="btn action" onclick="startOrder('build')">Order</button>
 </div>
 
 <!-- the configurator -->
@@ -322,9 +325,9 @@
     </div>
 
   </div>
-  <div class="sheet-foot">
+  <div class="sheet-foot raised">
     <span class="grow"><span class="amt" id="ord-amt">€3,330</span><span class="cap" id="ord-cap">Subtotal · ex VAT</span></span>
-    <button class="btn" id="ord-next" onclick="stepNext()">Next</button>
+    <button class="btn action" id="ord-next" onclick="stepNext()">Next</button>
   </div>
 </div>
 
@@ -343,7 +346,7 @@
     <p class="small" style="margin-top:6px;">We’ll email you when a new instrument is listed. No account required.</p>
     <form style="margin-top:16px;" id="contact-form">
       <input class="field" type="email" placeholder="Email address" required>
-      <button class="btn" type="submit" style="margin-top:18px;">Notify me</button>
+      <button class="btn action" type="submit" style="margin-top:18px;">Notify me</button>
     </form>
   </div>
 </div>
@@ -447,10 +450,10 @@ function pickSpec(i){
   var map = { shell:'dg-shell', dome:'dg-dome', fields:'dg-fields', rim:'dg-rim' };
   ['dg-shell','dg-dome','dg-fields','dg-rim'].forEach(function(id){
     var el = $(id), lit = (part === 'all') || (map[part] === id);
-    el.setAttribute('opacity', lit ? '1' : '.34');
-    if (id === 'dg-fields' || id === 'dg-dome') el.setAttribute('fill', lit ? '#9c9c9a' : '#d4d4d2');
-    if (id === 'dg-shell') el.setAttribute('fill', lit ? '#cfcfcd' : '#e4e4e2');
-    if (id === 'dg-rim') el.setAttribute('stroke', lit ? '#6e6e6e' : '#c9c9c9');
+    el.setAttribute('opacity', lit ? '1' : '.45');
+    if (id === 'dg-fields' || id === 'dg-dome') el.setAttribute('fill', lit ? '#16191A' : '#8C8F8A');
+    if (id === 'dg-shell') el.setAttribute('fill', lit ? '#8B714D' : '#DCD3C4');
+    if (id === 'dg-rim') el.setAttribute('stroke', lit ? '#16191A' : '#C9C0B0');
   });
 }
 

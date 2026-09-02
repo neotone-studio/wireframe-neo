@@ -3,20 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#FFFFFF">
 <title>Updates · Neotone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="neo.css">
 <style>
 .masthead-block{padding:22px var(--pad) 18px;}
-.masthead-block h1{font-size:30px;letter-spacing:-.03em;}
-.masthead-block .meta{margin-top:10px;text-transform:none;letter-spacing:0;font-size:15px;line-height:1.5;color:var(--muted);}
+.masthead-block h1{font-size:var(--t-display);line-height:var(--lh-display);letter-spacing:-.035em;font-weight:700;}
+.masthead-block .meta{margin-top:12px;text-transform:none;letter-spacing:0;font-family:var(--f-ui);font-size:var(--t-lead);line-height:var(--lh-lead);color:var(--muted);}
 .feed{padding:0 var(--pad);border-top:1px solid var(--line);}
 .feed .arow:last-child{border-bottom:0;}
 .arow .th.date{
   background:transparent;border:1px solid var(--line);flex-direction:column;gap:0;
-  font-size:15px;font-weight:600;color:var(--ink);line-height:1;
+  font-family:var(--f-mono);font-size:var(--t-ui);color:var(--ink);line-height:1;
 }
-.arow .th.date small{display:block;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;font-weight:500;}
+.arow .th.date small{display:block;font-size:8.5px;letter-spacing:var(--tr-label);text-transform:uppercase;color:var(--wood);margin-top:4px;}
 </style>
 </head>
 <body>

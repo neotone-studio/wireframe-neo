@@ -3,22 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#FFFFFF">
 <title>Tonefield · Neotone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Space+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="neo.css">
 <style>
 /* ---- page: the container ---------------------------------- */
 .masthead-block{padding:22px var(--pad) 18px;}
-.masthead-block h1{font-size:32px;letter-spacing:-.03em;}
-.masthead-block .meta{margin-top:8px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--muted);}
+.masthead-block h1{font-size:var(--t-display);line-height:var(--lh-display);letter-spacing:-.035em;font-weight:700;}
+.masthead-block .meta{margin-top:10px;text-transform:none;letter-spacing:0;font-family:var(--f-ui);font-size:var(--t-small);color:var(--muted);}
 
 .lead-item{display:block;width:100%;text-align:left;border-bottom:1px solid var(--line);}
 .lead-item:active{opacity:.6;}
-.lead-item .lead-media{aspect-ratio:3/2;}
+.lead-item .lead-media{aspect-ratio:3/2;width:auto;margin:0 var(--pad);}
 .lead-item .lead-body{padding:16px var(--pad) 22px;}
-.lead-item .k{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:block;}
-.lead-item h2{font-size:24px;line-height:1.16;letter-spacing:-.02em;font-weight:500;margin-top:9px;text-wrap:balance;}
-.lead-item .m{font-size:12.5px;color:var(--muted);display:block;margin-top:11px;}
+.lead-item .k{font-family:var(--f-mono);font-size:var(--t-label);letter-spacing:var(--tr-label);text-transform:uppercase;color:var(--wood);display:block;}
+.lead-item h2{font-size:var(--t-title);line-height:var(--lh-title);letter-spacing:-.025em;font-weight:700;margin-top:10px;text-wrap:balance;}
+.lead-item .m{font-size:12.5px;line-height:1.45;color:var(--muted);display:block;margin-top:12px;}
 
 .feed{padding:0 var(--pad);}
 .feed .arow:last-child{border-bottom:0;}
@@ -158,7 +161,7 @@ function renderFeed(){
 
   $('lead-slot').innerHTML = lead
     ? '<a class="lead-item" href="' + lead.href + '" id="' + lead.id + '">' +
-        '<div class="lead-media" style="aspect-ratio:3/2;"><span class="ph">Lead image</span></div>' +
+        '<div class="lead-media chamfer" style="aspect-ratio:3/2;"><span class="ph">Lead image</span></div>' +
         '<div class="lead-body">' +
           '<span class="k">' + lead.k + ' · The lead</span>' +
           '<h2>' + esc(lead.t) + '</h2>' +
