@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One · Neotone</title>
+  <style>
+    :root { --ink: #111; --line: #d9d9d9; --muted: #4f4f4f; --green: #2a7a2a; --max: 1180px; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    a { color: inherit; text-decoration: none; }
+
+    body { background: #fff; color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+
+    /* ---- Masthead ----
+       Neotone sits above the sections rather than beside them, which is the
+       whole point of v3: the company is the umbrella, and Culture, Instrument
+       and Craft are what it consists of.
+
+       Two states. At the top of a page the mark is centred with the sections
+       beneath it. Once you scroll, the bar collapses to a single row: small
+       mark on the left, sections on the right. The sections stay reachable the
+       whole way down, which the v2 nav could not do, since scrolling there
+       left only the return. */
+    /* ---- Masthead ----
+       Fixed height, contents positioned absolutely, and every moving value
+       driven by scroll position rather than by a timed transition. The bar is
+       therefore never mid-animation: where it sits is a function of how far
+       down the page you are. */
+    nav {
+      position: sticky; top: 0; z-index: 10;
+      background: #fff;
+      height: 118px;
+      /* Clipped left, right and top, open at the bottom. The row travels left as
+         you scroll and the items behind the current one go to negative x, which
+         would otherwise widen the page. overflow: hidden did that job but also
+         cut off the Instruments submenu, which hangs below the bar, and CSS
+         cannot clip one axis while leaving the other visible. */
+      clip-path: inset(0 0 -320px 0);
+    }
+    .nav-inner {
+      position: relative;
+      max-width: var(--max); margin: 0 auto; padding: 0 48px;
+      height: 100%;
+    }
+
+    .masthead {
+      position: absolute; left: 50%; top: 30px;
+      transform: translateX(-50%);
+      transform-origin: left center;
+      cursor: pointer;
+      will-change: transform, top;
+    }
+    .masthead img { height: 40px; width: auto; display: block; }
+
+    /* The row keeps its width the whole way down. Rather than folding items out
+       of the flow, which changes the width and makes the target move, the row
+       slides until the section you are in reaches the boundary. The others
+       travel with it and fade out. */
+    .sections {
+      position: absolute; left: 50%; top: 86px;
+      transform: translateX(-50%);
+      display: flex; align-items: baseline;
+      will-change: transform, top;
+    }
+    .sections a {
+      font-size: 14px; letter-spacing: 0.02em; color: var(--muted);
+      cursor: pointer; margin-left: 30px; white-space: nowrap;
+      /* No colour transition. Everything in this bar is a function of scroll
+         position, and a 200ms ease made the emphasis lag the scroll. */
+    }
+    .sections a:first-child { margin-left: 0; }
+
+
+    .sections a:hover { color: var(--ink); }
+    /* Emphasis on where you are: ink rather than grey, with a hairline under
+       it. Quiet enough to sit in a centred row of three, clear enough to read
+       as a position rather than as a hover state. */
+    .sections a {
+      padding-bottom: 4px;
+      border-bottom: 1px solid transparent;
+    }
+    .sections a.current {
+      color: var(--ink);
+      border-bottom-color: var(--ink);
+    }
+
+    @media (max-width: 980px) {
+      .nav-inner { padding: 0 24px; }
+      .sections a { margin-left: 20px; }
+    }
+
+
+    /* ---- Page ---- */
+    .page { max-width: var(--max); margin: 0 auto; padding: 0 48px 120px; }
+
+    /* ---- Page sections ----
+       Real structure at real type scale, holding placeholder words. Nothing here
+       is a labelled box describing what will go in it: dropping copy in should
+       not require touching layout. Chrome only where it carries information. */
+    .sec { margin-bottom: 88px; }
+    .sec:last-child { margin-bottom: 0; }
+
+
+    /* 2 · Specs strip. Hairlines between cells, no outer box: the dividers carry
+       the information, the box was only decoration. */
+    .specs-strip { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .spec-cell { padding: 22px 24px 24px 0; border-right: 1px solid var(--line); }
+    .spec-cell:last-child { border-right: none; padding-right: 0; }
+    .spec-cell:not(:first-child) { padding-left: 24px; }
+    .spec-label {
+      display: block; margin-bottom: 7px;
+      font-size: 9px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted);
+    }
+    .spec-value { font-size: 13px; line-height: 1.45; }
+
+    /* 3 · Orientation. One measure of prose, centred, no heading. */
+    .editorial { max-width: 620px; margin-left: auto; margin-right: auto; }
+    .neos { max-width: 620px; margin-left: auto; margin-right: auto; }
+    .neos-text { font-size: 17px; line-height: 1.75; margin: 0; }
+    .neos-name { font-size: 22px; line-height: 1; }
+    .neos-text a { border-bottom: 1px solid var(--line); }
+    .neos-text a:hover { border-bottom-color: var(--ink); }
+    .editorial-text { font-size: 17px; line-height: 1.75; margin: 0; }
+
+    /* 5 · Learn more. Depth for the already committed, so it sits after the
+       purchase flow. Whole block is the click target, and these open in a new
+       tab: their parent is Neotone, and the masthead would otherwise carry
+       someone mid-purchase back to culture. */
+    .stack { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .stack-two { grid-template-columns: repeat(2, 1fr); max-width: 760px; }
+    .stack-card { display: block; cursor: pointer; }
+    .stack-img { width: 100%; aspect-ratio: 4 / 3; background: #ededed; margin-bottom: 14px; }
+    .stack-kicker {
+      display: block; margin-bottom: 7px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--muted);
+    }
+    .stack-title { margin: 0; font-size: 16px; line-height: 1.4; font-weight: 400; }
+    .stack-card:hover .stack-title { text-decoration: underline; }
+
+    /* 6 · What happens next, with purchase terms beneath it. */
+    .sec-label {
+      display: block; margin-bottom: 22px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted);
+    }
+    .steps-strip { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
+    .step-cell { padding: 22px 24px 26px 0; border-right: 1px solid var(--line); }
+    .step-cell:last-child { border-right: none; padding-right: 0; }
+    .step-cell:not(:first-child) { padding-left: 24px; }
+    .step-number { display: block; margin-bottom: 12px; font-size: 22px; color: var(--muted); }
+    .step-title { margin: 0 0 7px; font-size: 13px; font-weight: 700; }
+    .step-desc { margin: 0; font-size: 12px; line-height: 1.55; color: var(--muted); }
+    .terms { margin-top: 30px; max-width: 620px; }
+    .terms-q { margin: 0 0 8px; font-size: 13px; font-weight: 700; }
+    .terms-a { margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
+
+    /* 7 · Play one first, as a fork. */
+    .sec-line {
+      margin: 0 auto 48px; max-width: 860px; text-align: center;
+      font-size: 25px; font-weight: 400; line-height: 1.4; letter-spacing: -0.01em;
+    }
+    .way-title { margin: 0 0 12px; font-size: 21px; font-weight: 400; letter-spacing: -0.01em; }
+    .way-text { margin: 0 0 16px; font-size: 15px; line-height: 1.7; }
+    .path-cta { font-size: 14px; cursor: pointer; }
+    .path-cta:hover { text-decoration: underline; }
+
+    @media (max-width: 980px) {
+      .opening { padding: 32px 0 40px; font-size: 19px; }
+      .opening-name { font-size: 28px; }
+      .specs-strip, .steps-strip, .stack { grid-template-columns: 1fr; }
+      .spec-cell, .step-cell { border-right: none; border-bottom: 1px solid var(--line); padding-left: 0; }
+      .spec-cell:last-child, .step-cell:last-child { border-bottom: none; }
+    }
+
+    /* ================================================================
+       Purchase machinery, ported from v1/one.html.
+       See v1/site-structure.md for the component reference.
+       ================================================================ */
+
+    .sans { font-family: Arial, Helvetica, sans-serif; }
+    .hidden { display: none; }
+
+    .block { border: 1px solid var(--line); padding: 16px; margin-bottom: 14px; }
+    .block-label {
+      margin: 0 0 6px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--muted); font-family: Arial, Helvetica, sans-serif;
+    }
+    .block-desc { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); font-family: Arial, Helvetica, sans-serif; }
+
+    .opt {
+      border: 1px solid var(--line); background: #fff; padding: 7px 10px;
+      font-size: 12px; font-family: Arial, Helvetica, sans-serif; cursor: pointer;
+    }
+    .opt.active { background: #f4f4f4; border-color: #999; }
+    .field {
+      width: 100%; border: 1px solid var(--line); padding: 8px; margin-top: 6px;
+      font-size: 13px; font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* ---- Order fork ---- */
+    .instrument-preview {
+      position: relative; width: 100%; height: 300px; background: var(--line);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    }
+    .instrument-preview-label {
+      font-size: 13px; font-weight: 700; font-family: Arial, Helvetica, sans-serif;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+    }
+    .instrument-preview-caption { font-size: 12px; font-style: italic; color: var(--muted); font-family: Arial, Helvetica, sans-serif; }
+    .tabs {
+      display: flex;
+      border-left: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+      margin-bottom: 14px;
+    }
+    .tab {
+      flex: 1; border: none; border-right: 1px solid var(--line);
+      background: #fff; padding: 18px 20px; text-align: left;
+      cursor: pointer; font-family: Arial, Helvetica, sans-serif;
+    }
+    .tab:last-child { border-right: none; }
+    .tab.active { background: #f7f7f7; box-shadow: inset 0 2px 0 var(--ink); }
+    .tab-title { display: block; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .tab-desc { display: block; font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .panel { padding: 0; }
+    .panel-intro {
+      font-size: 15px; line-height: 1.7;
+      margin: 0 auto 24px; max-width: 560px; color: var(--ink);
+    }
+
+    /* ---- Material cards ---- */
+    .material-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; }
+    .material-card { border: 1px solid var(--line); cursor: pointer; }
+    .material-card.active { border-color: var(--ink); }
+    .material-swatch { width: 100%; aspect-ratio: 1 / 1; background: #d4d4d4; }
+    .material-card.active .material-swatch { background: #b8b8b8; }
+    .material-card-body { padding: 8px 10px; }
+    .material-name { margin: 0 0 3px; font-size: 12px; font-weight: 700; font-family: Arial, Helvetica, sans-serif; }
+    .material-note { margin: 0; font-size: 10px; color: var(--muted); line-height: 1.4; font-family: Arial, Helvetica, sans-serif; }
+
+    /* ---- Stock cards ---- */
+    .stock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+    .stock-card { border: 1px solid var(--line); cursor: pointer; }
+    .stock-card.selected { border-color: var(--ink); }
+    .stock-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
+    .stock-card-body { padding: 10px 12px; }
+    .stock-card-serial {
+      display: block; font-size: 9px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 4px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .stock-card-wood { margin: 0 0 2px; font-size: 14px; }
+    .stock-card-price { display: block; font-size: 12px; color: var(--muted); margin-bottom: 8px; font-family: Arial, Helvetica, sans-serif; }
+    .stock-card-note { margin: 0; font-size: 11px; color: var(--muted); line-height: 1.5; font-style: italic; font-family: Arial, Helvetica, sans-serif; }
+    .bstock-badge {
+      display: inline-block; border: 1px solid #aaa; padding: 1px 6px;
+      font-size: 10px; color: #555; margin-left: 4px; vertical-align: middle;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* ---- Empty stock state ---- */
+    .stock-empty {
+      border: 1px solid var(--line); min-height: 200px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; margin-bottom: 8px; padding: 32px;
+    }
+    .stock-empty-head { font-size: 16px; font-style: italic; color: var(--muted); margin: 0; }
+    .stock-empty-body { font-size: 12px; color: var(--muted); text-align: center; line-height: 1.6; margin: 0; font-family: Arial, Helvetica, sans-serif; }
+    .wf-toggle { font-size: 11px; font-style: italic; color: var(--muted); cursor: pointer; background: none; border: none; padding: 0; margin-bottom: 20px; font-family: Arial, Helvetica, sans-serif; }
+    .wf-toggle:hover { text-decoration: underline; }
+
+    /* ---- Instrument summary ---- */
+    .summary-block { background: #f2f2f2; padding: 20px; margin-bottom: 14px; border: 1px solid var(--line); }
+    .summary-layout { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "pre controls" "post controls"; gap: 0 24px; margin-top: 8px; align-items: start; }
+    .sum-pre { grid-area: pre; }
+    .sum-controls { grid-area: controls; border-left: 1px solid var(--line); padding-left: 16px; }
+    .sum-post { grid-area: post; }
+    .ctrl-row { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
+    .ctrl-row:last-child { margin-bottom: 0; }
+    .ctrl-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-family: Arial, Helvetica, sans-serif; }
+    .ctrl-row select { width: 168px; border: 1px solid var(--line); padding: 5px 8px; font-size: 12px; font-family: Arial, Helvetica, sans-serif; background: #fff; cursor: pointer; }
+    .ctrl-input-row { display: flex; gap: 4px; width: 168px; }
+    .ctrl-input-row input { flex: 1; min-width: 0; border: 1px solid var(--line); padding: 5px 8px; font-size: 12px; font-family: Arial, Helvetica, sans-serif; }
+    .summary-total { font-size: 14px; color: var(--ink); font-family: Arial, Helvetica, sans-serif; margin: 6px 0 0; }
+    .summary-bookend-note {
+      display: block; font-size: 10px; font-style: italic; color: var(--muted);
+      font-family: Arial, Helvetica, sans-serif; margin-top: 10px;
+    }
+
+    /* ---- Accessories ---- */
+    .acc-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .acc-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
+    .acc-card { border: 1px solid var(--line); display: flex; flex-direction: column; }
+    .acc-card.acc-extra { display: none; }
+    .acc-grid.acc-expanded .acc-card.acc-extra { display: flex; }
+    .acc-swatch { width: 100%; aspect-ratio: 1; background: #d4d4d4; }
+    .acc-body { padding: 8px 10px 10px; display: flex; flex-direction: column; flex: 1; }
+    .acc-name { margin: 0 0 4px; font-size: 12px; font-weight: 700; font-family: Arial, Helvetica, sans-serif; }
+    .acc-desc { margin: 0 0 6px; font-size: 10px; color: var(--muted); line-height: 1.4; font-family: Arial, Helvetica, sans-serif; flex: 1; }
+    .acc-price { margin: 0 0 8px; font-size: 12px; font-family: Arial, Helvetica, sans-serif; }
+    .acc-included { margin: 0; font-size: 12px; font-family: Arial, Helvetica, sans-serif; }
+    .acc-btn { font-size: 11px; padding: 5px 8px; margin-top: auto; align-self: flex-start; }
+    .acc-show-btn { display: block; width: 100%; margin-top: 8px; padding: 8px; border: 1px solid var(--line); background: #fff; text-align: center; font-size: 11px; font-family: Arial, Helvetica, sans-serif; cursor: pointer; color: var(--muted); }
+    .acc-show-btn:hover { border-color: #aaa; color: var(--ink); }
+
+    /* ---- Email capture / questions ---- */
+    .email-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+    .email-row input[type="email"] {
+      padding: 7px 12px; border: 1px solid var(--line); font-size: 13px;
+      font-family: Arial, Helvetica, sans-serif; width: 220px;
+    }
+    .subscribe-btn {
+      padding: 7px 16px; background: var(--ink); color: #fff; border: none;
+      font-size: 12px; font-family: Arial, Helvetica, sans-serif; font-weight: 600;
+      letter-spacing: 0.04em; cursor: pointer;
+    }
+    .talk-block { border: 1px dashed #aaa; padding: 14px; margin-bottom: 14px; }
+
+    @media (max-width: 980px) {
+      .material-grid, .acc-grid { grid-template-columns: repeat(2, 1fr); }
+      .acc-card.acc-fifth { display: none; }
+      .acc-grid.acc-expanded .acc-card.acc-fifth { display: flex; }
+      .stock-grid { grid-template-columns: 1fr 1fr; }
+      .summary-layout { grid-template-columns: 1fr; grid-template-areas: "pre" "controls" "post"; }
+      .sum-controls { border-left: none; padding-left: 0; border-top: 1px solid var(--line); padding-top: 12px; margin: 10px 0; }
+      .sel-panel { width: 100%; }
+    }
+
+    /* ---- Selection Panel (ported from v1) ---- */
+    .sel-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.12);
+      z-index: 100; display: none;
+    }
+    .sel-overlay.open { display: block; }
+    .sel-panel {
+      position: fixed; top: 0; right: 0; height: 100vh; width: 360px;
+      background: #fff; border-left: 1px solid var(--line);
+      z-index: 101; transform: translateX(100%); transition: transform 0.18s ease;
+      display: flex; flex-direction: column;
+    }
+    .sel-panel.open { transform: translateX(0); }
+    .sel-header {
+      padding: 16px; border-bottom: 1px solid var(--line);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .sel-heading {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; margin: 0;
+    }
+    .sel-close {
+      background: none; border: none; cursor: pointer;
+      font-size: 11px; color: var(--muted); padding: 0;
+    }
+    .sel-close:hover { color: var(--ink); }
+    .sel-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .sel-empty { color: var(--muted); font-size: 13px; margin: 0; }
+    .sel-body .sel-item {
+      border: 1px solid var(--line); padding: 12px; margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+    }
+    .sel-item-info { flex: 1; }
+    .sel-item-name { margin: 0 0 3px; font-size: 13px; font-weight: 400; }
+    .sel-item-detail { margin: 0 0 5px; font-size: 11px; color: var(--muted); }
+    .sel-item-price { margin: 0; font-size: 12px; }
+    .sel-remove {
+      background: none; border: none; cursor: pointer; padding: 0;
+      font-size: 11px; color: var(--muted); white-space: nowrap;
+    }
+    .sel-remove:hover { text-decoration: underline; color: var(--ink); }
+    .sel-footer { padding: 16px; border-top: 1px solid var(--line); }
+    .sel-cta {
+      display: block; width: 100%; padding: 10px; background: var(--ink); color: #fff;
+      border: none; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; cursor: pointer;
+    }
+    .sel-cta:disabled { background: var(--line); color: var(--muted); cursor: default; }
+    .sel-total {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--line);
+      font-size: 12px;
+    }
+    .sel-save-row { display: flex; gap: 6px; margin-bottom: 10px; }
+    .sel-save-row input[type="email"] { flex: 1; border: 1px solid var(--line); padding: 6px 8px; font-size: 11px; font-family: inherit; }
+    .sel-save-btn { border: 1px solid var(--line); background: #fff; padding: 6px 10px; font-size: 11px; font-family: inherit; cursor: pointer; white-space: nowrap; }
+    .sel-save-label { font-size: 10px; color: var(--muted); margin: 0 0 5px; }
+    .subscribe-confirm { display: none; font-size: 11px; font-style: italic; color: var(--green); }
+
+    /* ---- Footer ----
+       Two quiet bands: sections + search, then utility + place. No column
+       headings, no dividers beyond a single hairline. Wraps rather than
+       needing breakpoints. */
+    .site-footer { background: #000; color: #fff; margin-top: 96px; }
+    .footer-inner { max-width: var(--max); margin: 0 auto; padding: 56px 48px; }
+
+    /* Top band restates the structure and holds search. The sections repeat the
+       bar deliberately: at the bottom of a page a reader is deciding what is
+       next, and a list of where they can go is useful even though the same list
+       is above. They also give search a left side, so it can sit right at its
+       own size rather than spanning the measure. */
+    .footer-top {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 32px; flex-wrap: wrap;
+    }
+    .footer-sections { display: flex; align-items: baseline; gap: 22px; flex-wrap: wrap; }
+    .footer-sections a {
+      font-size: 13px; color: #fff; text-decoration: none; cursor: pointer;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .footer-sections a:hover { opacity: 0.55; }
+
+    .footer-search { display: flex; align-items: center; width: 260px; max-width: 100%; }
+    .footer-search input {
+      flex: 1; min-width: 0; background: none; color: #fff;
+      border: none; border-bottom: 1px solid rgba(255,255,255,0.28);
+      padding: 6px 0; font-size: 13px; font-family: inherit;
+    }
+    .footer-search input::placeholder { color: rgba(255,255,255,0.35); }
+    .footer-search input:focus { outline: none; border-bottom-color: rgba(255,255,255,0.7); }
+    .footer-search button {
+      background: none; border: none; border-bottom: 1px solid rgba(255,255,255,0.28);
+      color: rgba(255,255,255,0.55); padding: 6px 0 6px 14px;
+      font-size: 14px; font-family: inherit; cursor: pointer;
+    }
+    .footer-search button:hover { color: #fff; }
+
+    .footer-band {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 20px 32px; flex-wrap: wrap;
+      margin-top: 44px; padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .footer-utility { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+    .footer-utility a { font-size: 12px; color: rgba(255,255,255,0.55); text-decoration: none; cursor: pointer; font-family: Arial, Helvetica, sans-serif; }
+    .footer-utility a:hover { color: #fff; }
+
+    .footer-place { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    @media (min-width: 981px) { .footer-place { align-items: flex-end; text-align: right; } }
+    .footer-meta { margin: 0; font-size: 12px; color: rgba(255,255,255,0.38); font-family: Arial, Helvetica, sans-serif; }
+    .footer-social a { color: rgba(255,255,255,0.55); cursor: pointer; }
+    .footer-social a:hover { color: #fff; }
+
+
+    /* ---- Instrument row ----
+       The instruments, named, at the top of every instrument page. This is the
+       page doing the job the nav should not: the nav says Instruments, the page
+       says which. Selection sits at the right end, on these pages only, because
+       purchase happens here. */
+    .instrument-row {
+      max-width: var(--max); margin: 0 auto; padding: 28px 48px 0;
+      display: flex; align-items: baseline; justify-content: space-between;
+    }
+    .instrument-row .names { display: flex; align-items: baseline; gap: 26px; }
+    .instrument-row .names a {
+      font-size: 13px; letter-spacing: 0.02em; color: var(--muted);
+      padding-bottom: 3px; border-bottom: 1px solid transparent;
+    }
+    .instrument-row .names a:hover { color: var(--ink); }
+    .instrument-row .names a.current { color: var(--ink); border-bottom-color: var(--ink); }
+    /* Selection, in the nav row at the right, level with the section names.
+       Only when the selection is non-empty, only on pages where purchase
+       happens. Stays through the collapse. */
+    /* Quieter than the section names: smaller, grey, no underline. The
+       underline means "you are here", and Selection is not a place. It is a
+       utility that happens to share the row. */
+    .sel-nav {
+      position: absolute; right: 48px; top: 88px;
+      font-size: 12px; letter-spacing: 0.03em; color: var(--muted);
+      background: none; border: none; padding: 0; cursor: pointer;
+      font-family: inherit;
+      opacity: 0; pointer-events: none; will-change: top;
+    }
+    .sel-nav:hover { color: var(--ink); }
+    .sel-nav.visible { opacity: 1; pointer-events: auto; }
+    .sel-count { margin-left: 5px; }
+    @media (max-width: 980px) { .instrument-row { padding: 20px 24px 0; } }
+
+    /* ---- Page opening ----
+       Every page opens with one centred statement of what it is for, with the
+       section's own name inside that sentence rather than above it as a
+       heading. The nav already names the page, so a headline only repeats it.
+       Same gesture on every page, so the whole site reads as written. */
+    /* Entry fade sits on the wrapper, not the heading. The animation uses
+       fill: both, so its final opacity keeps applying and would override the
+       scroll fade below. Two elements, two opacities, composed by the browser. */
+    .opening-wrap { animation: opening-in 760ms ease 140ms both; }
+    @keyframes opening-in {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .opening {
+      max-width: 720px; margin-left: auto; margin-right: auto;
+      padding: 64px 0 56px; text-align: center;
+      font-size: 21px; font-weight: 400; line-height: 1.7; color: var(--ink);
+    }
+    .opening-name { font-size: 34px; line-height: 1; letter-spacing: -0.01em; white-space: nowrap; }
+    @media (prefers-reduced-motion: reduce) {
+      .opening-wrap { animation: none; }
+    }
+    .editorial-pull {
+      margin: 1.4em 0; padding-left: 1.25rem;
+      border-left: 1px solid var(--line);
+      font-size: 21px; font-style: italic; line-height: 1.5; color: var(--muted);
+    }
+    .sec.neos { border: 1px solid var(--line); padding: 0; }
+    .neos-bar {
+      background: var(--ink); color: #fff; padding: 10px 40px;
+      font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .neos-body { padding: 30px 40px 34px; }
+    .neos-links { margin-top: 20px; display: flex; gap: 28px; flex-wrap: wrap; }
+    .ref-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; }
+    .ref-note a { border-bottom: 1px solid var(--line); }
+    .ref-note a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .network { margin-top: 44px; }
+    .artists-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .artist-card { border: 1px solid var(--line); display: flex; flex-direction: column; }
+    .artist-img { width: 100%; height: 180px; background: var(--line); flex-shrink: 0; }
+    .artist-card-body { padding: 12px; flex: 1; }
+    .artist-name { margin: 0 0 3px; font-size: 13px; font-weight: 700; font-family: Arial, Helvetica, sans-serif; }
+    .artist-desc { margin: 0 0 6px; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; line-height: 1.4; }
+    .session-status {
+      display: inline-block; font-size: 10px; font-family: Arial, Helvetica, sans-serif;
+      padding: 2px 7px; border: 1px solid var(--line);
+    }
+    .session-status.available { border-color: #333; }
+    .session-status.unavailable { color: #aaa; }
+    .artist-expand {
+      display: block; text-align: right; margin-top: 10px;
+      font-size: 11px; font-family: Arial, Helvetica, sans-serif;
+      cursor: pointer; background: none; border: none; padding: 0; color: var(--muted);
+    }
+    .artist-expand:hover { text-decoration: underline; }
+    .artist-detail { padding: 0 12px 12px; display: none; border-top: 1px solid var(--line); margin-top: 10px; }
+    .artist-detail.open { display: block; }
+    .artist-links { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .artist-link-btn {
+      border: 1px solid var(--line); background: #fff; padding: 5px 9px;
+      font-size: 11px; font-family: Arial, Helvetica, sans-serif; cursor: pointer;
+    }
+    .opt-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .artist-extra { display: none; }
+    .show-all-btn {
+      display: block; width: 100%; margin-top: 14px; padding: 10px;
+      border: 1px solid var(--line); background: #fff; text-align: center;
+      font-size: 12px; font-family: Arial, Helvetica, sans-serif;
+      cursor: pointer; color: var(--muted);
+    }
+    .show-all-btn:hover { border-color: #aaa; color: var(--ink); }
+    .subscribe { max-width: 620px; margin: 0 auto; }
+    .subscribe-label {
+      display: block; margin-bottom: 12px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: var(--muted);
+    }
+    .subscribe p { margin: 0 0 22px; font-size: 17px; line-height: 1.75; }
+    .subscribe-archive { color: var(--muted); border-bottom: 1px solid var(--line); }
+    .subscribe-archive:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .subscribe-form { display: flex; align-items: center; max-width: 420px; }
+    .subscribe-form input {
+      flex: 1; min-width: 0; background: none; color: var(--ink);
+      border: none; border-bottom: 1px solid var(--line);
+      padding: 8px 0; font-size: 15px; font-family: inherit;
+    }
+    .subscribe-form input::placeholder { color: var(--muted); }
+    .subscribe-form input:focus { outline: none; border-bottom-color: var(--ink); }
+    .subscribe-form button {
+      background: none; border: none; border-bottom: 1px solid var(--line);
+      color: var(--muted); padding: 8px 0 8px 16px;
+      font-size: 15px; font-family: inherit; cursor: pointer;
+    }
+    .subscribe-form button:hover { color: var(--ink); }
+    @media (max-width: 980px) { .artists-grid { grid-template-columns: 1fr; } .sec.neos { padding: 24px 20px; } }
+    .piece-media { margin: 0 0 88px; }
+    .lead-box { width: 100%; aspect-ratio: 2.4 / 1; background: #ededed; }
+    .diagram-caption { max-width: 860px; margin: 12px auto 0; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; text-align: center; }
+    .neos-doors { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .neos-door { display: block; border: 1px solid var(--line); padding: 14px 16px; }
+    .neos-door:hover .door-title { text-decoration: underline; }
+    .door-kind { display: block; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-family: Arial, Helvetica, sans-serif; margin-bottom: 6px; }
+    .door-title { display: block; font-size: 15px; margin-bottom: 4px; }
+    .door-desc { display: block; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; line-height: 1.5; }
+    .q-block { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); max-width: 560px; }
+    .q-label { margin: 0 0 6px; font-size: 13px; font-weight: 700; font-family: Arial, Helvetica, sans-serif; }
+    .q-desc { margin: 0 0 12px; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; }
+    .card-single { max-width: 480px; margin: 44px auto 0; }
+    .card-single .stack-img { aspect-ratio: 16 / 9; }
+    .stack-desc { margin: 4px 0 0; font-size: 13px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; line-height: 1.5; }
+    .spec-cell { cursor: pointer; }
+    .spec-cell.active { outline: 1px solid var(--ink); outline-offset: -1px; }
+    .spec-diagram-box {
+      grid-column: 1 / -1; width: 100%; margin-top: 24px; aspect-ratio: 2.8 / 1;
+      background: #f3f3f3; border: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .spec-diagram-note { max-width: 420px; padding: 0 24px; font-size: 12px; color: var(--muted); font-family: Arial, Helvetica, sans-serif; text-align: center; line-height: 1.6; }
+    .path-card { display: block; margin-top: 24px; max-width: 420px; }
+    .path-card .stack-img { aspect-ratio: 16 / 9; }
+    .way { max-width: 620px; margin: 0 auto 72px; text-align: center; }
+    .way:last-of-type { margin-bottom: 0; }
+    .way .path-card { margin: 32px auto 0; text-align: left; }
+    .terms-box { border: 1px solid var(--line); padding: 22px 26px; max-width: 620px; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <div class="masthead" role="presentation"><img src="media/wordmark/neotone.svg" alt="Neotone"></div>
+      <div class="sections">
+        <a href="index.html" data-section="instruments">Instruments</a>
+        <a href="tonefield.html" data-section="tonefield">Tonefield</a>
+      </div>
+      <button class="sel-nav" id="sel-nav" onclick="openSelectionPanel()">Selection<span class="sel-count" id="sel-count"></span></button>
+    </div>
+  </nav>
+
+  <div class="instrument-row">
+    <div class="names" role="navigation" aria-label="Instruments">
+      <a href="index.html" class="current">One</a>
+      <a href="anima.html">Anima</a>
+      <a href="treangle.html">Treangle</a>
+    </div>
+  </div>
+
+
+  <main class="page">
+
+    <!-- 1 · Opening -->
+    <div class="opening-wrap">
+    <h1 class="opening">The <span class="opening-name">Neotone One</span> is handcrafted in Budapest, built to order</h1>
+    <!-- Lead media, grid width, as a piece opens. The page never showed the
+         object before asking for the order. -->
+    <figure class="piece-media">
+      <div class="lead-box"></div>
+      <figcaption class="diagram-caption">Lead image: the instrument, perhaps in a scene. Image or interactive image; the designer&rsquo;s space.</figcaption>
+    </figure>
+    </div>
+
+    <!-- 2 · Orientation -->
+    <section class="sec editorial">
+      <p class="editorial-text">Roughly 120 words introducing the instrument concretely: its shape, its material, the serial number it carries. Plain prose in a single measure, no heading.</p>
+      <p class="editorial-pull">&ldquo;Pull quote that gives visual emphasis and draws the reader deeper into the instrument.&rdquo;</p>
+      <p class="editorial-text">A second short paragraph describing what comes with the instrument: warranty, what the order process looks like, a brief orientation to key features before the reader moves into the order section.</p>
+      <p class="editorial-text">Whether it is for you is a question the artists have answered in their own words: <a href="#" onclick="pieceLink(event)">Who is the Neotone for?</a></p>
+    </section>
+
+    <!-- 3 · Specs strip -->
+    <section class="sec specs-strip">
+      <div class="spec-cell" onclick="specFocus(this, 'Material')">
+        <span class="spec-label">Material</span>
+        <span class="spec-value">Hand selected instrument grade hardwood</span>
+      </div>
+      <div class="spec-cell" onclick="specFocus(this, 'Sound')">
+        <span class="spec-label">Sound</span>
+        <span class="spec-value">Cor sound engine, samples from world-class instruments</span>
+      </div>
+      <div class="spec-cell" onclick="specFocus(this, 'Control')">
+        <span class="spec-label">Control</span>
+        <span class="spec-value">20 tonefields, gesture resolution, fully assignable</span>
+      </div>
+      <div class="spec-cell" onclick="specFocus(this, 'Scales')">
+        <span class="spec-label">Scales</span>
+        <span class="spec-value">Unlimited, including harmonics, crosstalk, and articulation</span>
+      </div>
+      <div class="spec-cell" onclick="specFocus(this, 'Lead time')">
+        <span class="spec-label">Lead time</span>
+        <span class="spec-value">~60 days, or stock available immediately</span>
+      </div>
+      <div class="spec-diagram-box"><span class="spec-diagram-note" id="spec-diagram-caption">Interactive diagram: select a spec above and the corresponding part of the instrument highlights.</span></div>
+    </section>
+
+    <!-- 3b · neOS. The software is part of the instrument today, so it is
+         named here, on the instrument, rather than given a place in the nav.
+         The day it ships on its own it becomes a product, and Instruments gets a
+         sibling called Software. Until then this block is where a reader learns
+         the name. -->
+    <section class="sec neos">
+      <div class="neos-bar">neOS</div>
+      <div class="neos-body">
+        <p class="neos-text">Every Neotone One runs <span class="neos-name">neOS</span>, the software that holds its scales, its gallery and its settings. It is where scales are built and shared, and it updates over the air, so an instrument keeps changing after it leaves the workshop. It comes with the instrument.</p>
+        <div class="neos-doors">
+        <a class="neos-door" href="manual.html">
+          <span class="door-kind">Reference</span>
+          <span class="door-title">The manual</span>
+          <span class="door-desc">Every control, in three depths.</span>
+        </a>
+        <a class="neos-door" href="manual-scales.html">
+          <span class="door-kind">Walkthrough</span>
+          <span class="door-title">Scales</span>
+          <span class="door-desc">Build one, guided, in a few minutes.</span>
+        </a>
+        <a class="neos-door" href="neos-note-names.html">
+          <span class="door-kind">The idea</span>
+          <span class="door-title">Why the note names change as you build</span>
+          <span class="door-desc">In Tonefield.</span>
+        </a>
+      </div>
+      </div>
+    </section>
+
+    <!-- 4 · Order fork -->
+    <section class="block" style="padding: 0; overflow: hidden; margin-bottom: 14px;">
+
+      <div class="tabs sans">
+        <button class="tab active" id="tab-build" onclick="switchFork('build')">
+          <span class="tab-title">Built to Order</span>
+          <span class="tab-desc">Built for you in Budapest. About six weeks.</span>
+        </button>
+        <button class="tab" id="tab-stock" onclick="switchFork('stock')">
+          <span class="tab-title">From Stock</span>
+          <span class="tab-desc">Finished instruments at the workshop, ready to ship.</span>
+        </button>
+      </div>
+
+      <div style="padding: 16px;">
+
+        <!-- Built to Order -->
+        <div id="panel-build" class="panel">
+          <p class="panel-intro">Choose the wood. A deposit confirms your place in the build queue.</p>
+
+          <div class="material-grid">
+            <div class="material-card" id="wood-ash" onclick="selectWood('Ash',0)">
+              <div class="material-swatch"></div>
+              <div class="material-card-body">
+                <p class="material-name">Ash</p>
+                <p class="material-note">Light grain, bright attack</p>
+              </div>
+            </div>
+            <div class="material-card" id="wood-oak" onclick="selectWood('Oak',0)">
+              <div class="material-swatch"></div>
+              <div class="material-card-body">
+                <p class="material-name">Oak</p>
+                <p class="material-note">Dense body, warm sustain</p>
+              </div>
+            </div>
+            <div class="material-card active" id="wood-mahogany" onclick="selectWood('Mahogany',90)">
+              <div class="material-swatch"></div>
+              <div class="material-card-body">
+                <p class="material-name">Mahogany</p>
+                <p class="material-note">Rich mid-range, full resonance</p>
+              </div>
+            </div>
+            <div class="material-card" id="wood-cherry" onclick="selectWood('Cherry',90)">
+              <div class="material-swatch"></div>
+              <div class="material-card-body">
+                <p class="material-name">Cherry</p>
+                <p class="material-note">Refined tone, medium weight</p>
+              </div>
+            </div>
+            <div class="material-card" id="wood-walnut" onclick="selectWood('Walnut',190)">
+              <div class="material-swatch"></div>
+              <div class="material-card-body">
+                <p class="material-name">Walnut</p>
+                <p class="material-note">Dark grain, deep bass response</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="summary-block sans">
+            <p class="block-label">Your instrument</p>
+            <div class="summary-layout">
+              <div class="sum-pre">
+                <p class="block-desc" id="sum-wood" style="margin-top:4px;">Wood: Mahogany</p>
+                <p class="block-desc" id="sum-base" style="margin-top:4px;">Base price: EUR 3,240</p>
+                <p class="block-desc" id="sum-disc" style="margin-top:4px;">Referral discount: 0%</p>
+              </div>
+              <div class="sum-controls">
+                <div class="ctrl-row">
+                  <label class="ctrl-label" for="vat-country-build">Destination Country</label>
+                  <select id="vat-country-build" onchange="changeVATCountry(this.value)">
+                    <option value="HU">Hungary</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="US">United States</option>
+                  </select>
+                  <p class="block-desc" style="font-size:11px; margin-top:3px;">Used to calculate VAT</p>
+                </div>
+                <div class="ctrl-row">
+                  <label class="ctrl-label" for="refcode">Artist Referral Code</label>
+                  <div class="ctrl-input-row">
+                    <input id="refcode" placeholder="Optional" />
+                    <button class="opt" onclick="applyCode()">Apply</button>
+                  </div>
+                  <p id="refmsg" class="block-desc" style="font-size:11px; margin-top:3px;">No code applied.</p>
+                  <p class="ref-note">Codes come from artist sessions.</p>
+                </div>
+              </div>
+              <div class="sum-post">
+                <p class="block-desc" id="sum-vat" style="margin-top:4px;"></p>
+                <p class="summary-total" id="sum-total" style="margin-top:4px;"></p>
+              </div>
+            </div>
+            <button class="opt" style="margin-top:14px;" onclick="addBuildToSelection()">Add to Selection</button>
+            <span class="summary-bookend-note">End of purchase flow. Sections below are supplementary.</span>
+
+            <div class="acc-section">
+              <p class="block-label">Accessories</p>
+              <div class="acc-grid" id="acc-grid-build"></div>
+              <button class="acc-show-btn" onclick="toggleAccessories(this)">Show more accessories &darr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- From Stock -->
+        <div id="panel-stock" class="panel hidden">
+          <p class="panel-intro">Each stock instrument is a specific, complete object with its own history. Select one below.</p>
+
+          <div id="stock-available">
+            <div class="stock-grid">
+              <div class="stock-card" id="stock-a" onclick="selectStock('Serial No. 821', false)">
+                <img src="media/finish/neotone-walnut-01.png" alt="Serial No. 821" />
+                <div class="stock-card-body">
+                  <span class="stock-card-serial">Serial No. 821</span>
+                  <p class="stock-card-wood">Walnut</p>
+                  <span class="stock-card-price">EUR 3,800</span>
+                  <p class="stock-card-note">Played in workshop sessions. No cosmetic marks. Full warranty.</p>
+                </div>
+              </div>
+              <div class="stock-card" id="stock-b" onclick="selectStock('Serial No. 873', false)">
+                <img src="media/finish/neotone-cherry-01.png" alt="Serial No. 873" />
+                <div class="stock-card-body">
+                  <span class="stock-card-serial">Serial No. 873</span>
+                  <p class="stock-card-wood">Cherry</p>
+                  <span class="stock-card-price">EUR 3,980</span>
+                  <p class="stock-card-note">Studio instrument. Light playing wear on upper rim. Full warranty.</p>
+                </div>
+              </div>
+              <div class="stock-card" id="stock-c" onclick="selectStock('Serial No. 907', true)">
+                <img src="media/finish/neotone-oak-01.png" alt="Serial No. 907" />
+                <div class="stock-card-body">
+                  <span class="stock-card-serial">Serial No. 907 <span class="bstock-badge">B-stock</span></span>
+                  <p class="stock-card-wood">Oak</p>
+                  <span class="stock-card-price">EUR 3,100</span>
+                  <p class="stock-card-note">Minor cosmetic marking on lower body. Fully functional. Same warranty applies.</p>
+                </div>
+              </div>
+            </div>
+            <button class="wf-toggle" onclick="toggleStockEmpty()">Preview: no stock available &uarr;</button>
+          </div>
+
+          <div id="stock-empty-state" class="hidden">
+            <div class="stock-empty">
+              <p class="stock-empty-head">No stock instruments available at this time.</p>
+              <p class="stock-empty-body">New stock is listed here as instruments become available.<br>Built to order is always open.</p>
+            </div>
+            <button class="wf-toggle" onclick="toggleStockEmpty()">Preview: show stock instruments &uarr;</button>
+          </div>
+
+          <div class="summary-block sans">
+            <p class="block-label">Your instrument</p>
+            <div class="summary-layout">
+              <div class="sum-pre">
+                <p class="block-desc" id="stock-sum-item" style="margin-top:4px;">Select an instrument above</p>
+                <p class="block-desc" id="stock-sum-base" style="margin-top:4px;">Base price: –</p>
+                <p class="block-desc" id="stock-sum-disc" style="margin-top:4px;">Referral discount: 0%</p>
+              </div>
+              <div class="sum-controls">
+                <div class="ctrl-row">
+                  <label class="ctrl-label" for="vat-country-stock">Destination Country</label>
+                  <select id="vat-country-stock" onchange="changeVATCountry(this.value)">
+                    <option value="HU">Hungary</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="US">United States</option>
+                  </select>
+                  <p class="block-desc" style="font-size:11px; margin-top:3px;">Used to calculate VAT</p>
+                </div>
+                <div class="ctrl-row">
+                  <label class="ctrl-label" for="stock-refcode">Artist Referral Code</label>
+                  <div class="ctrl-input-row">
+                    <input id="stock-refcode" placeholder="Optional" />
+                    <button class="opt" onclick="applyStockCode()">Apply</button>
+                  </div>
+                  <p id="stock-refmsg" class="block-desc" style="font-size:11px; margin-top:3px;">No code applied.</p>
+                  <p class="ref-note">Codes come from artist sessions.</p>
+                </div>
+              </div>
+              <div class="sum-post">
+                <p class="block-desc" id="stock-sum-vat" style="margin-top:4px;"></p>
+                <p class="summary-total" id="stock-sum-total" style="margin-top:4px;"><strong>Total: –</strong></p>
+              </div>
+            </div>
+            <button class="opt" style="margin-top:14px;" onclick="addStockToSelection()">Add to Selection</button>
+            <span class="summary-bookend-note">End of purchase flow. Sections below are supplementary.</span>
+
+            <div class="acc-section">
+              <p class="block-label">Accessories</p>
+              <div class="acc-grid" id="acc-grid-stock"></div>
+              <button class="acc-show-btn" onclick="toggleAccessories(this)">Show more accessories &darr;</button>
+            </div>
+          </div>
+
+          <div class="block sans" style="margin-bottom: 14px;">
+            <p class="block-label">Notify me when new stock becomes available</p>
+            <p class="block-desc" style="margin-top:4px;">We'll email you when a new instrument is listed. No account required.</p>
+            <form class="email-row" onsubmit="handleNotify(event)">
+              <input type="email" placeholder="Email address" required />
+              <button class="subscribe-btn" type="submit">Notify me</button>
+              <span class="subscribe-confirm">You're on the list</span>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5 · What happens next, with purchase terms. Beside the fork,
+         because terms belong next to the ask. -->
+    <section class="sec">
+      <span class="sec-label">What happens next</span>
+      <div class="steps-strip">
+        <div class="step-cell">
+          <span class="step-number">1</span>
+          <p class="step-title">Confirmation</p>
+          <p class="step-desc">You'll receive an order confirmation and your serial number by email right away. Your place in the production sequence is secured.</p>
+        </div>
+        <div class="step-cell">
+          <span class="step-number">2</span>
+          <p class="step-title">Workshop contact</p>
+          <p class="step-desc">Someone from the workshop will contact you to confirm your configuration and answer any questions before the build begins.</p>
+        </div>
+        <div class="step-cell">
+          <span class="step-number">3</span>
+          <p class="step-title">Build</p>
+          <p class="step-desc">Your instrument enters production. You'll receive updates as it progresses.</p>
+        </div>
+        <div class="step-cell">
+          <span class="step-number">4</span>
+          <p class="step-title">Delivery</p>
+          <p class="step-desc">Your instrument will arrive with its <a href="manual.html">manual</a>, warranty, and setup guidance.</p>
+        </div>
+      </div>
+      <div class="terms terms-box">
+        <p class="terms-q">Can I change my mind?</p>
+        <p class="terms-a">Yes, at any point. Before your instrument is built, during production, or within two weeks of delivery. Cancel or return for a full refund, no explanation required.</p>
+      </div>
+      <div class="q-block">
+        <p class="q-label">Questions?</p>
+        <p class="q-desc">Anything the page has not covered. Someone from the workshop replies.</p>
+        <input class="field" placeholder="Your name" />
+        <input class="field" placeholder="Email" />
+        <textarea class="field" rows="3" placeholder="Your question or message" style="resize:vertical;"></textarea>
+        <button class="opt" style="margin-top:8px;" onclick="alert('Sends to the workshop inbox. Not wired up yet.')">Send</button>
+      </div>
+    </section>
+
+    <!-- 6 · Play one first: the retail network. Neotone has no shops, so the
+         people below are where the instrument can be met. Shops join the same
+         grid the day a partnership is real, and not before. -->
+    <section class="sec" id="play-one">
+      <span class="sec-label">Play one first</span>
+      <p class="sec-line">If you&rsquo;d like to play a Neotone One in person, there are two ways.</p>
+      <div class="way">
+        <h3 class="way-title">Visit the workshop</h3>
+        <p class="way-text">Our full stock, available to play. Sessions are by appointment and unhurried. Write to arrange a time, bring an afternoon.</p>
+        <a class="path-cta" onclick="alert('Opens an email to the workshop. Not wired up yet.')">Write to us &rarr;</a>
+        <a class="stack-card path-card" href="#" onclick="pieceLink(event)">
+          <div class="stack-img"></div>
+          <p class="stack-title">Every instrument starts with a conversation</p>
+          <p class="stack-desc">Read about the workshop: the production line, told through the twelve people who run it.</p>
+        </a>
+      </div>
+      <div class="way" id="artist-directory">
+        <h3 class="way-title">Reach out to a Neotone artist</h3>
+        <p class="way-text">Artists host sessions in their studios and homes around the world; some answer questions over a call, in your language. Sessions are free, and if you order afterwards your host&rsquo;s code takes five percent off and credits them.</p>
+      </div>
+      <div class="network">
+    <div class="opt-row sans">
+      <button class="opt active" onclick="filterArtists('all',this)">All</button>
+      <button class="opt" onclick="filterArtists('europe',this)">Europe</button>
+      <button class="opt" onclick="filterArtists('americas',this)">Americas</button>
+      <button class="opt" onclick="filterArtists('asia',this)">Asia</button>
+      <button class="opt" onclick="filterArtists('sessions',this)">In-person sessions</button>
+    </div>
+    <div id="artists" class="artists-grid">
+
+      <div class="artist-card artist" data-region="europe" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Lena Voss &middot; Germany</p>
+          <p class="artist-desc">Electroacoustic composition and live gesture practice.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-lena', this)">Expand</button>
+        </div>
+        <div id="artist-lena" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Lena works between acoustic improvisation and electronic processing. Based in Berlin, she teaches instrument practice and runs monthly open sessions.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+            <a class="artist-link-btn" href="#">Soundcloud</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist" data-region="americas" data-sessions="false">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Rafael Montes &middot; Colombia</p>
+          <p class="artist-desc">Ritual performance and scale-driven improvisation.</p>
+          <button class="artist-expand" onclick="toggleArtist('artist-rafael', this)">Expand</button>
+        </div>
+        <div id="artist-rafael" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Rafael's practice integrates tuning systems from Andean tradition with contemporary gesture. His recordings are available via Bandcamp.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Bandcamp</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist" data-region="asia" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Yuki Tanaka &middot; Japan</p>
+          <p class="artist-desc">Minimalist solo work and spatial listening sessions.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-yuki', this)">Expand</button>
+        </div>
+        <div id="artist-yuki" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Yuki focuses on sustained tones and room acoustics. Based in Kyoto, she hosts small-group listening and instrument sessions by arrangement.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">YouTube</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist" data-region="europe" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Marta Hoffmann &middot; Poland</p>
+          <p class="artist-desc">Improvisation and contemporary compositional practice.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-marta', this)">Expand</button>
+        </div>
+        <div id="artist-marta" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Marta works across composed and improvised forms. Based in Warsaw, she runs regular sessions and is available for workshops and collaborative projects.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist" data-region="americas" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Elena Vasquez &middot; Argentina</p>
+          <p class="artist-desc">Field recording, tuning research, and ensemble work.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-elena', this)">Expand</button>
+        </div>
+        <div id="artist-elena" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Elena's practice draws on acoustic ecology and microtonality. Based in Buenos Aires, she hosts instrument sessions and gives talks on tuning systems.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist artist-sixth" data-region="asia" data-sessions="false">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Hiroshi Naka &middot; South Korea</p>
+          <p class="artist-desc">Electronic texture and extended technique for handpan.</p>
+          <button class="artist-expand" onclick="toggleArtist('artist-hiroshi', this)">Expand</button>
+        </div>
+        <div id="artist-hiroshi" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Hiroshi combines the Neotone One with modular synthesis and live processing. His practice is centred on timbre and spectral density. Virtual sessions by arrangement.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">YouTube</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist artist-extra" data-region="europe" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Anna Svensson &middot; Sweden</p>
+          <p class="artist-desc">Ambient composition and meditative performance practice.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-anna', this)">Expand</button>
+        </div>
+        <div id="artist-anna" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Anna works with long-form ambient pieces and sustained resonance. Based in Gothenburg, she hosts intimate listening sessions in her studio.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Soundcloud</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist artist-extra" data-region="europe" data-sessions="false">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Marco Ferretti &middot; Italy</p>
+          <p class="artist-desc">Solo performance and instrument pedagogy.</p>
+          <button class="artist-expand" onclick="toggleArtist('artist-marco', this)">Expand</button>
+        </div>
+        <div id="artist-marco" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Marco teaches instrument practice and has developed a method for integrating handpan techniques with the Neotone One. Virtual sessions available.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="artist-card artist artist-extra" data-region="asia" data-sessions="true">
+        <div class="artist-img"></div>
+        <div class="artist-card-body">
+          <p class="artist-name">Sung-Ah Kim &middot; Taiwan</p>
+          <p class="artist-desc">Cross-cultural improvisation and collaborative sound work.</p>
+          <span class="session-status available">In-person sessions</span>
+          <button class="artist-expand" onclick="toggleArtist('artist-sungah', this)">Expand</button>
+        </div>
+        <div id="artist-sungah" class="artist-detail">
+          <p class="block-desc" style="font-size:12px; margin-bottom:8px;">Sung-Ah performs and teaches across East Asia, working between traditional Korean forms and contemporary improvised practice. Sessions held in Taipei.</p>
+          <div class="artist-links">
+            <a class="artist-link-btn" href="#">Website</a>
+            <a class="artist-link-btn" href="#">Instagram</a>
+            <a class="artist-link-btn" href="#">Contact for sessions</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <button class="show-all-btn" id="show-all-btn" onclick="toggleShowAll(this)">Show all artists</button>
+      </div>
+      <div class="card-single">
+        <a class="stack-card" href="#" onclick="pieceLink(event)">
+          <div class="stack-img"></div>
+          <p class="stack-title">Who is the Neotone for?</p>
+          <p class="stack-desc">The question, answered by the artists in their own words.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- 7 · Mailing list, the same component as the feed's end -->
+    <section class="sec">
+      <div class="subscribe">
+        <span class="subscribe-label">Mailing list</span>
+        <p>Updates from the Neotone workshop</p>
+        <form class="subscribe-form" onsubmit="handleSubscribe(event)">
+          <input type="email" placeholder="Email" required />
+          <button type="submit" aria-label="Subscribe">&rarr;</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div class="sel-overlay" id="sel-overlay" onclick="closeSelectionPanel()"></div>
+  <div class="sel-panel" id="sel-panel">
+    <div class="sel-header">
+      <p class="sel-heading">Selection</p>
+      <button class="sel-close" onclick="closeSelectionPanel()">Close</button>
+    </div>
+    <div class="sel-body" id="sel-body">
+      <p class="sel-empty">Your selection is empty.</p>
+    </div>
+    <div class="sel-footer">
+      <div class="sel-total" id="sel-total" style="display: none;">
+        <span>Total</span><span id="sel-total-amount"></span>
+      </div>
+      <div id="sel-save-section" style="display: none; margin-bottom: 10px;">
+        <p class="sel-save-label">Save this selection</p>
+        <form class="sel-save-row" onsubmit="handleSaveSelection(event)">
+          <input type="email" placeholder="Your email address" required />
+          <button class="sel-save-btn" type="submit">Save</button>
+          <span class="subscribe-confirm">Saved!</span>
+        </form>
+      </div>
+      <button class="sel-cta" id="sel-cta" disabled
+        onclick="goToCheckout()">Proceed to Payment</button>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+
+      <div class="footer-top">
+        <div class="footer-sections">
+          <a href="index.html">Instruments</a>
+          <a href="tonefield.html">Tonefield</a>
+        </div>
+        <form class="footer-search" onsubmit="handleSearch(event)">
+          <input type="search" placeholder="Search" />
+          <button type="submit" aria-label="Search">&rarr;</button>
+        </form>
+      </div>
+
+      <div class="footer-band">
+        <div class="footer-utility">
+          <a onclick="utilityLink('Workshop')">Workshop</a>
+          <a href="updates.html">Updates</a>
+          <a onclick="utilityLink('Contact')">Contact</a>
+          <a href="legal.html">Legal</a>
+        </div>
+        <div class="footer-place">
+          <p class="footer-meta">Budapest &middot; visits by appointment</p>
+          <p class="footer-meta footer-social">
+            <a onclick="socialLink('Instagram')">Instagram</a> &middot;
+            <a onclick="socialLink('YouTube')">YouTube</a> &middot;
+            <a onclick="socialLink('TikTok')">TikTok</a> &middot;
+            <a onclick="socialLink('Facebook')">Facebook</a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <script>
+    /* ---- Masthead ----
+       SECTION is which of the three this page belongs to, empty on pages that
+       belong to none. It marks the current section. With the sections on screen
+       the whole way down there is nothing to return from, which removes most of
+       the machinery v2 needed. */
+    const SECTION = 'instruments';
+
+    const nav      = document.querySelector('nav');
+    const navInner = document.querySelector('.nav-inner');
+    const masthead = document.querySelector('.masthead');
+    const sections = document.querySelector('.sections');
+    const links    = [...document.querySelectorAll('.sections a')];
+
+    /* The section this page belongs to is marked from the first frame. Pages
+       belonging to no section, legal for instance, mark nothing. */
+    const current = links.find(a => a.dataset.section === SECTION);
+    if (current) current.classList.add('current');
+
+    /* Two overlapping ranges. The sections you are not in fade first and
+       slowly; the pair travels left over a longer distance, so the move reads
+       as deliberate and stays tied to the scroll rather than snapping. */
+    const FADE_FROM  = 20,  FADE_TO  = 220;
+    const SHIFT_FROM = 60,  SHIFT_TO = 460;
+    const MARK_TOP   = [30, 22];
+    const SECT_TOP   = [86, 62];
+    const MARK_SCALE = [1, 0.55];
+
+    let markShift = null;
+    const selNav = document.getElementById('sel-nav');
+
+
+    /* Measured with the bar at rest, so the numbers are the distance from where
+       each element sits when centred to the content boundary. Remeasured once
+       the wordmark has loaded, since an image with no width measures wrong. */
+    function measure() {
+      const style = getComputedStyle(navInner);
+      const contentLeft = navInner.getBoundingClientRect().left + parseFloat(style.paddingLeft);
+      const rest = el => {
+        const prev = el.style.transform;
+        el.style.transform = 'translateX(-50%)';
+        const left = el.getBoundingClientRect().left;
+        el.style.transform = prev;
+        return left;
+      };
+      markShift = Math.round(contentLeft - rest(masthead));
+      /* offsetLeft on a link is measured inside .sections, which is its offset
+         parent, so it is added to the row's own left rather than compared with
+         it. Both targets are the same content boundary, which is what puts the
+         mark and the section you are in on one left edge. */
+
+    }
+
+    const ramp = (y, a, b) => Math.min(Math.max((y - a) / (b - a), 0), 1);
+    const lerp = (r, t) => r[0] + (r[1] - r[0]) * t;
+
+    /* The ramps are scaled to the page. On a short page, a placeholder or an
+       empty checkout, there is not enough scroll to travel the full distance,
+       and the bar would stop part way. Scaling the ranges to the available
+       scroll means the collapse always completes by the bottom, however far
+       the bottom is. */
+    function scrollRange() {
+      return Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+    }
+
+    function updateNav() {
+      if (markShift === null) measure();
+      const y = window.scrollY;
+      const k = Math.min(1, scrollRange() / SHIFT_TO) || 1;
+      const fade  = ramp(y, FADE_FROM * k, FADE_TO * k);
+      const shift = ramp(y, SHIFT_FROM * k, SHIFT_TO * k);
+
+      masthead.style.top = lerp(MARK_TOP, shift) + 'px';
+      masthead.style.transform =
+        'translateX(calc(-50% + ' + (markShift * shift) + 'px)) scale(' + lerp(MARK_SCALE, shift) + ')';
+
+      sections.style.top = lerp(SECT_TOP, shift) + 'px';
+
+      /* Selection sits at the right of the row, level with the section names,
+         and stays through the collapse: it is an affordance, not a section. */
+      if (selNav) selNav.style.top = (lerp(SECT_TOP, shift) + 2) + 'px';
+
+      /* Every section fades, the current one included. Collapsed, the bar is
+         the name alone: present, and a way back to the menu. The page says
+         where you are; the bar does not have to. */
+      links.forEach(a => {
+        a.style.opacity = String(1 - fade);
+        a.style.pointerEvents = fade > 0.9 ? 'none' : '';
+      });
+
+
+    }
+
+    /* Once the bar has moved, the mark reopens it. At rest it goes to the
+       front, which is what it says. */
+    /* Collapsed, the bar is a label rather than a menu: the two sections you are
+       not in are invisible and take no clicks. Anywhere in the bar reopens it,
+       so reaching for a section name that is not there does something sensible
+       instead of nothing. The section you are in still behaves as a link. */
+    /* Collapsed, the bar is a label rather than a menu, and anywhere in it
+       reopens the bar. The section you are in behaves exactly as the mark does,
+       because at that point the two are halves of one label and clicking either
+       should do the same thing. */
+    nav.addEventListener('click', e => {
+      const own = e.target.closest('.sections a[data-section="' + SECTION + '"]');
+      if (own) {
+        e.preventDefault();
+        if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      if (window.scrollY <= SHIFT_FROM) return;
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    function remeasure() { markShift = null; updateNav(); }
+    window.addEventListener('resize', remeasure);
+    window.addEventListener('load', remeasure);
+    document.querySelectorAll('nav img').forEach(img => {
+      if (!img.complete) img.addEventListener('load', remeasure, { once: true });
+    });
+
+
+
+    window.addEventListener('scroll', updateNav, { passive: true });
+    updateNav();
+
+    /* ---- Footer ---- */
+    /* Footer section links rise before they leave. At the bottom of a page the
+       bar is collapsed to a label, so navigating straight away would cut to a
+       page with the menu already open. Scrolling up first lets it unfold on the
+       way out, and the next page then opens in the state you left this one in.
+
+       The interval watches for the scroll to land; the timeout fires the
+       navigation regardless, covering smooth scrolling being disabled or
+       interrupted, so the link can never become a dead end. */
+    function scrollToTopThen(after) {
+      if (window.scrollY < 4) { if (after) after(); return; }
+      let gone = false;
+      const go = () => { if (!gone) { gone = true; if (after) after(); } };
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const watch = setInterval(() => {
+        if (window.scrollY < 4) { clearInterval(watch); setTimeout(go, 160); }
+      }, 50);
+      setTimeout(() => { clearInterval(watch); go(); }, 1200);
+    }
+
+    document.querySelectorAll('.footer-sections a').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const href = link.getAttribute('href');
+        const here = location.pathname.split('/').pop() || 'tonefield.html';
+        /* Already here: just go back to the top and let the bar reopen. */
+        if (href === here) { scrollToTopThen(null); return; }
+        scrollToTopThen(() => { window.location.href = href; });
+      });
+    });
+
+    /* ================================================================
+       Purchase machinery, ported from v1/one.html.
+       ================================================================ */
+
+    var state = {
+      wood: "Mahogany", woodExtra: 90, discount: 0, orderMode: "build",
+      stockSelection: "", stockPrice: 0, stockIsBstock: false
+    };
+    var BASE_PRICE = 3150;
+    var stockEmptyVisible = false;
+    var VAT_RATES = { HU: 0.27, DE: 0.19, FR: 0.20, US: null };
+    var VAT_NAMES = { HU: "Hungary", DE: "Germany", FR: "France", US: "United States" };
+    var vatCountry = localStorage.getItem('neotone_country') || 'HU';
+
+    /* Accessories are data rather than duplicated markup: the same list is
+       rendered into both panels, and cards are built with addEventListener
+       rather than inline onclick so names containing quotes cannot break
+       attribute parsing. */
+    const ACCESSORIES = [
+      { name: 'Neotone Semi-Rigid Case', desc: 'Safely transport and store your Neotone One', included: true },
+      { name: 'Donut Stand',             desc: 'Low profile protection when playing on a flat surface', included: true },
+      { name: 'Desktop Stand',           desc: 'For tabletop display and cable organization', price: 12 },
+      { name: 'Intech Knot',             desc: 'Midi USB host for controlling Neotone One with external instruments', price: 80 },
+      { name: 'Headphone “L” Adapter', desc: 'Low profile headphone connection', price: 2, vis: 'acc-fifth' },
+      { name: 'MIDI DIN Adapter',        desc: 'Connect to classic MIDI hardware', price: 8,  vis: 'acc-extra' },
+      { name: 'Wood Care Kit',           desc: 'Maintain the finish of your instrument', price: 9,  vis: 'acc-extra' },
+      { name: 'Neotone Carry Bag',       desc: 'Lightweight canvas bag for everyday transport', price: 28, vis: 'acc-extra' }
+    ];
+
+    function renderAccessories() {
+      ['acc-grid-build', 'acc-grid-stock'].forEach(function(gridId) {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+        grid.innerHTML = '';
+        ACCESSORIES.forEach(function(a) {
+          const card = document.createElement('div');
+          card.className = 'acc-card' + (a.vis ? ' ' + a.vis : '');
+
+          const swatch = document.createElement('div');
+          swatch.className = 'acc-swatch';
+          card.appendChild(swatch);
+
+          const body = document.createElement('div');
+          body.className = 'acc-body';
+
+          const nm = document.createElement('p');
+          nm.className = 'acc-name';
+          nm.textContent = a.name;
+          body.appendChild(nm);
+
+          const ds = document.createElement('p');
+          ds.className = 'acc-desc';
+          ds.textContent = a.desc;
+          body.appendChild(ds);
+
+          if (a.included) {
+            const inc = document.createElement('p');
+            inc.className = 'acc-included';
+            inc.textContent = 'Included';
+            body.appendChild(inc);
+          } else {
+            const pr = document.createElement('p');
+            pr.className = 'acc-price';
+            pr.setAttribute('data-raw', a.price);
+            pr.textContent = 'EUR ' + a.price;
+            body.appendChild(pr);
+
+            const btn = document.createElement('button');
+            btn.className = 'opt acc-btn';
+            btn.textContent = 'Add to Selection';
+            btn.addEventListener('click', function() { addAccToSelection(a.name, a.desc, a.price); });
+            body.appendChild(btn);
+          }
+
+          card.appendChild(body);
+          grid.appendChild(card);
+        });
+      });
+    }
+
+    function formatWithVat(rawBase) {
+      var rate = VAT_RATES[vatCountry];
+      var total = rate ? Math.round(rawBase * (1 + rate)) : rawBase;
+      return 'EUR ' + total.toLocaleString('en-US');
+    }
+    function updateAccPrices() {
+      document.querySelectorAll('[data-raw]').forEach(function(el) {
+        el.textContent = formatWithVat(parseFloat(el.getAttribute('data-raw')));
+      });
+    }
+    function changeVATCountry(val) {
+      vatCountry = val;
+      localStorage.setItem('neotone_country', val);
+      var d1 = document.getElementById("vat-country-build");
+      var d2 = document.getElementById("vat-country-stock");
+      if (d1) d1.value = val;
+      if (d2) d2.value = val;
+      updateBuildSummary();
+      updateStockSummary();
+      updateAccPrices();
+    }
+    function vatLine(subtotal) {
+      var rate = VAT_RATES[vatCountry];
+      if (rate === null) return { text: "No VAT (import duties may apply)", total: subtotal };
+      var amount = Math.round(subtotal * rate);
+      return {
+        text: Math.round(rate * 100) + "% VAT (" + VAT_NAMES[vatCountry] + "): EUR " + amount.toLocaleString("en-US"),
+        total: subtotal + amount
+      };
+    }
+
+    function switchFork(which) {
+      state.orderMode = which;
+      document.getElementById("tab-build").classList.toggle("active", which === "build");
+      document.getElementById("tab-stock").classList.toggle("active", which === "stock");
+      document.getElementById("panel-build").classList.toggle("hidden", which !== "build");
+      document.getElementById("panel-stock").classList.toggle("hidden", which !== "stock");
+      updateCaption();
+    }
+
+    function selectWood(name, extra) {
+      state.wood = name; state.woodExtra = extra;
+      ["ash","oak","mahogany","cherry","walnut"].forEach(function(id) {
+        document.getElementById("wood-"+id).classList.remove("active");
+      });
+      document.getElementById("wood-"+name.toLowerCase()).classList.add("active");
+      updateCaption(); updateBuildSummary();
+    }
+
+    function selectStock(serialName, isBstock) {
+      state.stockSelection = serialName; state.stockIsBstock = isBstock;
+      var prices = {"Serial No. 821":3800,"Serial No. 873":3980,"Serial No. 907":3100};
+      state.stockPrice = prices[serialName] || 0;
+      ["stock-a","stock-b","stock-c"].forEach(function(id) { document.getElementById(id).classList.remove("selected"); });
+      var idMap = {"Serial No. 821":"stock-a","Serial No. 873":"stock-b","Serial No. 907":"stock-c"};
+      if (idMap[serialName]) document.getElementById(idMap[serialName]).classList.add("selected");
+      updateCaption(); updateStockSummary();
+    }
+
+    function updateCaption() {
+      var el = document.getElementById("selection-caption");
+      if (!el) return;
+      if (state.orderMode === "stock") {
+        el.textContent = state.stockSelection ? "From Stock · " + state.stockSelection : "From Stock · Select an instrument below";
+      } else {
+        el.textContent = "Built to Order · " + state.wood;
+      }
+    }
+
+    function applyCode() {
+      var code = document.getElementById("refcode").value.trim().toUpperCase();
+      var valid = ["DANNY10","LENA","SOFIA"];
+      state.discount = valid.indexOf(code) !== -1 ? 5 : 0;
+      document.getElementById("refmsg").textContent = valid.indexOf(code) !== -1
+        ? "Valid code. 5% discount applied." : (code.length > 0 ? "Code not recognised." : "No code applied.");
+      updateBuildSummary();
+    }
+
+    function applyStockCode() {
+      var code = document.getElementById("stock-refcode").value.trim().toUpperCase();
+      var valid = ["DANNY10","LENA","SOFIA"];
+      if (state.stockIsBstock) {
+        document.getElementById("stock-refmsg").textContent = "Referral codes do not apply to B-stock items.";
+        state.discount = 0;
+      } else {
+        state.discount = valid.indexOf(code) !== -1 ? 5 : 0;
+        document.getElementById("stock-refmsg").textContent = valid.indexOf(code) !== -1
+          ? "Valid code. 5% discount applied." : (code.length > 0 ? "Code not recognised." : "No code applied.");
+      }
+      updateStockSummary();
+    }
+
+    function updateBuildSummary() {
+      var rawBase = BASE_PRICE + state.woodExtra;
+      var subtotal = rawBase - Math.round(rawBase * state.discount / 100);
+      var vat = vatLine(subtotal);
+      document.getElementById("sum-wood").textContent = "Wood: " + state.wood;
+      document.getElementById("sum-base").textContent = "Base price: EUR " + rawBase.toLocaleString("en-US");
+      document.getElementById("sum-disc").textContent = "Referral discount: " + state.discount + "%";
+      document.getElementById("sum-vat").textContent = vat.text;
+      document.getElementById("sum-total").innerHTML = "<strong>Total: EUR " + vat.total.toLocaleString("en-US") + "</strong>";
+    }
+
+    function updateStockSummary() {
+      if (!state.stockSelection) return;
+      var rawBase = state.stockPrice;
+      var subtotal = state.stockIsBstock ? rawBase : rawBase - Math.round(rawBase * state.discount / 100);
+      var vat = vatLine(subtotal);
+      document.getElementById("stock-sum-item").textContent = state.stockSelection;
+      document.getElementById("stock-sum-base").textContent = "Base price: EUR " + rawBase.toLocaleString("en-US");
+      document.getElementById("stock-sum-disc").textContent = state.stockIsBstock
+        ? "Referral discount: not applicable (B-stock)" : "Referral discount: " + state.discount + "%";
+      document.getElementById("stock-sum-vat").textContent = vat.text;
+      document.getElementById("stock-sum-total").innerHTML = "<strong>Total: EUR " + vat.total.toLocaleString("en-US") + "</strong>";
+    }
+
+    function toggleStockEmpty() {
+      stockEmptyVisible = !stockEmptyVisible;
+      document.getElementById("stock-available").classList.toggle("hidden", stockEmptyVisible);
+      document.getElementById("stock-empty-state").classList.toggle("hidden", !stockEmptyVisible);
+    }
+
+    function toggleAccessories(btn) {
+      var grid = btn.closest('.acc-section').querySelector('.acc-grid');
+      var expanded = grid.classList.toggle('acc-expanded');
+      btn.innerHTML = expanded ? 'Show fewer accessories &uarr;' : 'Show more accessories &darr;';
+    }
+
+    function addAccToSelection(name, desc, rawBase) {
+      var vat = vatLine(rawBase);
+      addToSelection(name, desc, 'EUR ' + vat.total.toLocaleString('en-US'),
+        { rawBase: rawBase, discountPct: 0, discountEligible: false });
+    }
+
+    function addBuildToSelection() {
+      var rawBase = BASE_PRICE + state.woodExtra;
+      var subtotal = Math.round(rawBase * (1 - state.discount / 100));
+      var vat = vatLine(subtotal);
+      addToSelection('Neotone One', 'Built to Order · ' + state.wood, 'EUR ' + vat.total.toLocaleString("en-US"),
+        { rawBase: rawBase, discountPct: state.discount, discountEligible: true });
+    }
+
+    function addStockToSelection() {
+      if (!state.stockSelection) {
+        alert('No instrument selected. Please choose an instrument from the list above.');
+        return;
+      }
+      var rawBase = state.stockPrice;
+      var subtotal = state.stockIsBstock ? rawBase : Math.round(rawBase * (1 - state.discount / 100));
+      var vat = vatLine(subtotal);
+      addToSelection('Neotone One', 'From Stock · ' + state.stockSelection, 'EUR ' + vat.total.toLocaleString("en-US"),
+        { rawBase: rawBase, discountPct: state.stockIsBstock ? 0 : state.discount, discountEligible: !state.stockIsBstock });
+    }
+
+    function handleNotify(e) {
+      e.preventDefault();
+      alert("Stock notification sign-up. Not wired up yet.");
+      var form = e.target;
+      form.querySelector(".subscribe-btn").style.display = "none";
+      form.querySelector(".subscribe-confirm").style.display = "inline";
+    }
+
+    /* ---- Selection (ported from v1) ---- */
+
+    // Cached so the scroll handler never parses localStorage.
+    let selCount = 0;
+
+    /* The indicator lives at the right end of the instrument row, on
+       instrument pages only, because that is where purchase happens. Shown
+       whenever the selection is non-empty. */
+    function updateSelNav() {
+      const el = document.getElementById('sel-nav');
+      if (!el) return;
+      el.classList.toggle('visible', selCount > 0);
+    }
+
+    function getSelItems() {
+      try { return JSON.parse(localStorage.getItem('neotone_sel') || '[]'); } catch(e) { return []; }
+    }
+    function saveSelItems(items) {
+      try { localStorage.setItem('neotone_sel', JSON.stringify(items)); } catch(e) {}
+    }
+    function addToSelection(name, detail, price, extras) {
+      const items = getSelItems();
+      const item = { id: Date.now(), name: name, detail: detail, price: price };
+      if (extras) { item.rawBase = extras.rawBase; item.discountPct = extras.discountPct; item.discountEligible = extras.discountEligible || false; }
+      items.push(item);
+      saveSelItems(items);
+      renderSelection();
+      openSelectionPanel();
+    }
+    function removeFromSelection(id) {
+      const items = getSelItems().filter(i => i.id !== id);
+      saveSelItems(items);
+      renderSelection();
+    }
+    function renderSelection() {
+      const items       = getSelItems();
+      const body        = document.getElementById('sel-body');
+      const count       = document.getElementById('sel-count');
+      const cta         = document.getElementById('sel-cta');
+      const totalDiv    = document.getElementById('sel-total');
+      const totalAmt    = document.getElementById('sel-total-amount');
+      const saveSection = document.getElementById('sel-save-section');
+
+      selCount = items.length;
+
+      if (items.length === 0) {
+        body.innerHTML = '<p class="sel-empty">Your selection is empty.</p>';
+        count.textContent = '';
+        cta.disabled = true;
+        totalDiv.style.display = 'none';
+        saveSection.style.display = 'none';
+      } else {
+        body.innerHTML = items.map(item =>
+          '<div class="sel-item">' +
+            '<div class="sel-item-info">' +
+              '<p class="sel-item-name">' + item.name + '</p>' +
+              '<p class="sel-item-detail">' + item.detail + '</p>' +
+              '<p class="sel-item-price">' + item.price + '</p>' +
+            '</div>' +
+            '<button class="sel-remove" onclick="removeFromSelection(' + item.id + ')">Remove</button>' +
+          '</div>'
+        ).join('');
+        count.textContent = ' (' + items.length + ')';
+        cta.disabled = false;
+        saveSection.style.display = 'block';
+
+        let sum = 0;
+        items.forEach(item => {
+          const n = parseFloat(item.price.replace('EUR ', '').replace(/,/g, ''));
+          if (!isNaN(n)) sum += n;
+        });
+        totalAmt.textContent = 'EUR ' + sum.toLocaleString('en-US');
+        totalDiv.style.display = 'flex';
+      }
+
+      updateSelNav();
+    }
+    function goToCheckout() {
+      window.location.href = 'checkout.html';
+    }
+    function openSelectionPanel() {
+      renderSelection();
+      document.getElementById('sel-overlay').classList.add('open');
+      document.getElementById('sel-panel').classList.add('open');
+    }
+    function closeSelectionPanel() {
+      document.getElementById('sel-overlay').classList.remove('open');
+      document.getElementById('sel-panel').classList.remove('open');
+    }
+    function handleSaveSelection(e) {
+      e.preventDefault();
+      alert("Emails a link to this selection. Not wired up yet.");
+      const form = e.target;
+      form.querySelector('.sel-save-btn').style.display = 'none';
+      form.querySelector('.subscribe-confirm').style.display = 'inline';
+    }
+
+    /* ---- Init ----
+       Order matters: accessory cards must exist before updateAccPrices()
+       can find their [data-raw] elements, which changeVATCountry() triggers. */
+    renderAccessories();
+    changeVATCountry(vatCountry);
+    updateCaption();
+    renderSelection();
+
+    var currentFilter = "all";
+    var showAllActive = false;
+
+      function filterArtists(filter, button) {
+      currentFilter = filter;
+      document.querySelectorAll(".artist").forEach(function(card) {
+        var isExtra = card.classList.contains("artist-extra");
+        var isSixth = card.classList.contains("artist-sixth") && window.innerWidth <= 980;
+        if (!showAllActive && (isExtra || isSixth)) { card.style.display = "none"; return; }
+        var show = filter === "all"
+          || (filter === "sessions" && card.getAttribute("data-sessions") === "true")
+          || card.getAttribute("data-region") === filter;
+        card.style.display = show ? "flex" : "none";
+      });
+      document.querySelectorAll(".opt-row .opt").forEach(function(b) { b.classList.remove("active"); });
+      if (button) button.classList.add("active");
+    }
+
+    function toggleShowAll(btn) {
+      showAllActive = !showAllActive;
+      var activeBtn = document.querySelector(".opt-row .opt.active");
+      filterArtists(currentFilter, activeBtn);
+      btn.textContent = showAllActive ? "Show fewer" : "Show all artists";
+    }
+
+    function toggleArtist(id, btn) {
+      var detail = document.getElementById(id);
+      detail.classList.toggle("open");
+      btn.textContent = detail.classList.contains("open") ? "Collapse" : "Expand";
+    }
+
+    function handleSubscribe(e) {
+      e.preventDefault();
+      alert("Mailing list sign-up. Not wired up yet.");
+    }
+
+    function specFocus(cell, label) {
+      document.querySelectorAll(".spec-cell").forEach(function(c){ c.classList.remove("active"); });
+      cell.classList.add("active");
+      document.getElementById("spec-diagram-caption").textContent = "Highlighting: " + label + ".";
+    }
+
+    function pieceLink(e) {
+      e.preventDefault();
+      alert("Piece not drafted yet.");
+    }
+
+    function handleSearch(e) {
+      e.preventDefault();
+      alert("Site search. Not mocked up yet.");
+    }
+    /* Outbound, so they leave the site rather than routing through it. Wired as
+       alerts here because the accounts are not linked yet. */
+    function socialLink(name) {
+      alert("Neotone on " + name + ". External link, not wired up yet.");
+    }
+
+    function utilityLink(name) {
+      alert(name === 'Workshop'
+        ? "Workshop: the people and the production process. Not mocked up yet."
+        : name + " page. Not mocked up yet.");
+    }
+
+
+  </script>
+
+</body>
+</html>
